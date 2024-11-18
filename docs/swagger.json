@@ -1,0 +1,415 @@
+{
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "simple intranet dns management system, dns crud operation with centos bind9",
+        "title": "sre dns service backend demo",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:16789",
+    "paths": {
+        "/api/v1/api": {
+            "put": {
+                "description": "api's active and audit attributes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "update api",
+                "parameters": [
+                    {
+                        "description": "id: api db id; audit: true 1, request logged; active: true 1, in use",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/apis.updateApiReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "api updated",
+                        "schema": {
+                            "$ref": "#/definitions/apis.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/apis": {
+            "get": {
+                "description": "page query apis by params",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "list api",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page, min=1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size, min=10, max=1000",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "api path",
+                        "name": "path",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "api method",
+                        "name": "method",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "api activated",
+                        "name": "active",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "apis",
+                        "schema": {
+                            "$ref": "#/definitions/apis.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dns": {
+            "get": {
+                "description": "基于bind9 dns服务的针对dns的动态添加",
+                "tags": [
+                    "dns-operation"
+                ],
+                "summary": "intranet dns crud",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mock参数",
+                        "name": "mock",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "测试接口",
+                        "schema": {
+                            "$ref": "#/definitions/apis.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ping": {
+            "get": {
+                "tags": [
+                    "health"
+                ],
+                "summary": "service ping api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mock",
+                        "name": "mock",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "pong",
+                        "schema": {
+                            "$ref": "#/definitions/apis.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/roles": {
+            "get": {
+                "description": "get all system roles in pages",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "list system roles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "min=1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min=10, max=1000",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "role chinese name",
+                        "name": "name_cn",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "roles",
+                        "schema": {
+                            "$ref": "#/definitions/apis.StdResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "add role",
+                "parameters": [
+                    {
+                        "description": "role request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SysRole"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "role id",
+                        "schema": {
+                            "$ref": "#/definitions/apis.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/roles/{id}": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "del role",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "role id",
+                        "schema": {
+                            "$ref": "#/definitions/apis.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/roles/{id}/apis": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "role detail",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "role detail with accessible apis",
+                        "schema": {
+                            "$ref": "#/definitions/apis.StdResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "apis.StdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "data"
+                },
+                "error": {
+                    "description": "self serr",
+                    "$ref": "#/definitions/models.Errors"
+                },
+                "pages": {
+                    "description": "pages",
+                    "$ref": "#/definitions/models.PageRsp"
+                },
+                "request_id": {
+                    "description": "api request uid",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "true: succeed, false: failed",
+                    "type": "boolean"
+                }
+            }
+        },
+        "apis.updateApiReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "audit": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Api": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "description": "api is activated or not, 0 false",
+                    "type": "boolean"
+                },
+                "audit": {
+                    "description": "api is audited or not, 0 false",
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "description": "create time",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "api description",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "primary id",
+                    "type": "integer"
+                },
+                "method": {
+                    "description": "api method",
+                    "type": "string"
+                },
+                "path": {
+                    "description": "api path",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "create time",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Errors": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "self error code",
+                    "type": "integer"
+                },
+                "message": {
+                    "description": "self error message",
+                    "type": "string"
+                }
+            }
+        },
+        "models.PageRsp": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.SysRole": {
+            "type": "object",
+            "properties": {
+                "accessible_apis": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Api"
+                    }
+                },
+                "api_ids": {
+                    "type": "object"
+                },
+                "created_at": {
+                    "description": "create time",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "primary id",
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "name_cn": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "modified time",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

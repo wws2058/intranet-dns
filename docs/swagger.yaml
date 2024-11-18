@@ -1,0 +1,276 @@
+consumes:
+- application/json
+definitions:
+  apis.StdResponse:
+    properties:
+      data:
+        description: data
+      error:
+        $ref: '#/definitions/models.Errors'
+        description: self serr
+      pages:
+        $ref: '#/definitions/models.PageRsp'
+        description: pages
+      request_id:
+        description: api request uid
+        type: string
+      status:
+        description: 'true: succeed, false: failed'
+        type: boolean
+    type: object
+  apis.updateApiReq:
+    properties:
+      active:
+        type: boolean
+      audit:
+        type: boolean
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  models.Api:
+    properties:
+      active:
+        description: api is activated or not, 0 false
+        type: boolean
+      audit:
+        description: api is audited or not, 0 false
+        type: boolean
+      created_at:
+        description: create time
+        type: string
+      description:
+        description: api description
+        type: string
+      id:
+        description: primary id
+        type: integer
+      method:
+        description: api method
+        type: string
+      path:
+        description: api path
+        type: string
+      updated_at:
+        description: create time
+        type: string
+    type: object
+  models.Errors:
+    properties:
+      code:
+        description: self error code
+        type: integer
+      message:
+        description: self error message
+        type: string
+    type: object
+  models.PageRsp:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  models.SysRole:
+    properties:
+      accessible_apis:
+        items:
+          $ref: '#/definitions/models.Api'
+        type: array
+      api_ids:
+        type: object
+      created_at:
+        description: create time
+        type: string
+      id:
+        description: primary id
+        type: integer
+      name:
+        type: string
+      name_cn:
+        type: string
+      updated_at:
+        description: modified time
+        type: string
+    type: object
+host: localhost:16789
+info:
+  contact: {}
+  description: simple intranet dns management system, dns crud operation with centos
+    bind9
+  title: sre dns service backend demo
+  version: "1.0"
+paths:
+  /api/v1/api:
+    put:
+      description: api's active and audit attributes
+      parameters:
+      - description: 'id: api db id; audit: true 1, request logged; active: true 1,
+          in use'
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/apis.updateApiReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: api updated
+          schema:
+            $ref: '#/definitions/apis.StdResponse'
+      summary: update api
+      tags:
+      - system
+  /api/v1/apis:
+    get:
+      description: page query apis by params
+      parameters:
+      - description: page, min=1
+        in: query
+        name: page
+        type: integer
+      - description: page size, min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: api path
+        in: query
+        name: path
+        type: string
+      - description: api method
+        in: query
+        name: method
+        type: string
+      - description: api activated
+        in: query
+        name: active
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: apis
+          schema:
+            $ref: '#/definitions/apis.StdResponse'
+      summary: list api
+      tags:
+      - system
+  /api/v1/dns:
+    get:
+      description: 基于bind9 dns服务的针对dns的动态添加
+      parameters:
+      - description: mock参数
+        in: query
+        name: mock
+        type: string
+      responses:
+        "200":
+          description: 测试接口
+          schema:
+            $ref: '#/definitions/apis.StdResponse'
+      summary: intranet dns crud
+      tags:
+      - dns-operation
+  /api/v1/ping:
+    get:
+      parameters:
+      - description: mock
+        in: query
+        name: mock
+        type: string
+      responses:
+        "200":
+          description: pong
+          schema:
+            $ref: '#/definitions/apis.StdResponse'
+      summary: service ping api
+      tags:
+      - health
+  /api/v1/roles:
+    get:
+      description: get all system roles in pages
+      parameters:
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: role chinese name
+        in: query
+        name: name_cn
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: roles
+          schema:
+            $ref: '#/definitions/apis.StdResponse'
+      summary: list system roles
+      tags:
+      - system
+    post:
+      parameters:
+      - description: role request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SysRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role id
+          schema:
+            $ref: '#/definitions/apis.StdResponse'
+      summary: add role
+      tags:
+      - system
+  /api/v1/roles/{id}:
+    delete:
+      parameters:
+      - description: role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role id
+          schema:
+            $ref: '#/definitions/apis.StdResponse'
+      summary: del role
+      tags:
+      - system
+  /api/v1/roles/{id}/apis:
+    get:
+      parameters:
+      - description: role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role detail with accessible apis
+          schema:
+            $ref: '#/definitions/apis.StdResponse'
+      summary: role detail
+      tags:
+      - system
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"
