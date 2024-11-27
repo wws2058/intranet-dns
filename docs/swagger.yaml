@@ -1,23 +1,6 @@
 consumes:
 - application/json
 definitions:
-  apis.StdResponse:
-    properties:
-      data:
-        description: data
-      error:
-        $ref: '#/definitions/models.Errors'
-        description: self serr
-      pages:
-        $ref: '#/definitions/models.PageRsp'
-        description: pages
-      request_id:
-        description: api request uid
-        type: string
-      status:
-        description: 'true: succeed, false: failed'
-        type: boolean
-    type: object
   apis.updateApiReq:
     properties:
       active:
@@ -28,6 +11,62 @@ definitions:
         type: integer
     required:
     - id
+    type: object
+  apis.updateRoleReq:
+    properties:
+      api_ids:
+        description: role accessible apis id
+        items:
+          type: integer
+        type: array
+      id:
+        description: role id
+        type: integer
+      name:
+        description: role en name
+        type: string
+      name_cn:
+        description: role cn name
+        type: string
+    required:
+    - id
+    type: object
+  apis.updateUserReq:
+    properties:
+      active:
+        description: user is active
+        type: boolean
+      email:
+        description: user email address
+        minLength: 1
+        type: string
+      id:
+        description: user id
+        type: integer
+      role_ids:
+        description: user roles
+        items:
+          type: integer
+        type: array
+    required:
+    - id
+    type: object
+  ctx.StdResponse:
+    properties:
+      data:
+        description: data
+      error:
+        $ref: '#/definitions/models.Errors'
+        description: self err
+      pages:
+        $ref: '#/definitions/models.PageRsp'
+        description: pages
+      request_id:
+        description: api request uid
+        type: string
+      status:
+        description: 'true: succeed, false: failed'
+        type: boolean
     type: object
   models.Api:
     properties:
@@ -93,7 +132,43 @@ definitions:
       name_cn:
         type: string
       updated_at:
-        description: modified time
+        description: create time
+        type: string
+    type: object
+  models.SysUser:
+    properties:
+      active:
+        description: user is banned, active=0
+        type: boolean
+      created_at:
+        description: create time
+        type: string
+      email:
+        description: user email address
+        minLength: 1
+        type: string
+      id:
+        description: primary id
+        type: integer
+      last_login:
+        description: create time
+        type: string
+      login_times:
+        description: user login times
+        type: integer
+      name:
+        description: user name
+        minLength: 1
+        type: string
+      name_cn:
+        description: user cn name
+        minLength: 1
+        type: string
+      role_ids:
+        description: user roles
+        type: object
+      updated_at:
+        description: create time
         type: string
     type: object
 host: localhost:16789
@@ -104,26 +179,6 @@ info:
   title: sre dns service backend demo
   version: "1.0"
 paths:
-  /api/v1/api:
-    put:
-      description: api's active and audit attributes
-      parameters:
-      - description: 'id: api db id; audit: true 1, request logged; active: true 1,
-          in use'
-        in: body
-        name: request
-        schema:
-          $ref: '#/definitions/apis.updateApiReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: api updated
-          schema:
-            $ref: '#/definitions/apis.StdResponse'
-      summary: update api
-      tags:
-      - system
   /api/v1/apis:
     get:
       description: page query apis by params
@@ -154,13 +209,31 @@ paths:
         "200":
           description: apis
           schema:
-            $ref: '#/definitions/apis.StdResponse'
+            $ref: '#/definitions/ctx.StdResponse'
       summary: list api
+      tags:
+      - system
+    put:
+      description: api's active and audit attributes
+      parameters:
+      - description: 'id: api db id; audit: true 1, request logged; active: true 1,
+          in use'
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/apis.updateApiReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: api updated
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update api
       tags:
       - system
   /api/v1/dns:
     get:
-      description: 基于bind9 dns服务的针对dns的动态添加
       parameters:
       - description: mock参数
         in: query
@@ -168,9 +241,9 @@ paths:
         type: string
       responses:
         "200":
-          description: 测试接口
+          description: OK
           schema:
-            $ref: '#/definitions/apis.StdResponse'
+            $ref: '#/definitions/ctx.StdResponse'
       summary: intranet dns crud
       tags:
       - dns-operation
@@ -185,7 +258,7 @@ paths:
         "200":
           description: pong
           schema:
-            $ref: '#/definitions/apis.StdResponse'
+            $ref: '#/definitions/ctx.StdResponse'
       summary: service ping api
       tags:
       - health
@@ -211,7 +284,7 @@ paths:
         "200":
           description: roles
           schema:
-            $ref: '#/definitions/apis.StdResponse'
+            $ref: '#/definitions/ctx.StdResponse'
       summary: list system roles
       tags:
       - system
@@ -229,8 +302,26 @@ paths:
         "200":
           description: role id
           schema:
-            $ref: '#/definitions/apis.StdResponse'
-      summary: add role
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add system role
+      tags:
+      - system
+    put:
+      parameters:
+      - description: role request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateRoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update system role
       tags:
       - system
   /api/v1/roles/{id}:
@@ -247,7 +338,7 @@ paths:
         "200":
           description: role id
           schema:
-            $ref: '#/definitions/apis.StdResponse'
+            $ref: '#/definitions/ctx.StdResponse'
       summary: del role
       tags:
       - system
@@ -265,8 +356,95 @@ paths:
         "200":
           description: role detail with accessible apis
           schema:
-            $ref: '#/definitions/apis.StdResponse'
-      summary: role detail
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: system role accessible apis
+      tags:
+      - system
+  /api/v1/users:
+    get:
+      parameters:
+      - description: page, min=1
+        in: query
+        name: page
+        type: integer
+      - description: page size, min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: user role's id
+        in: query
+        name: role_id
+        type: integer
+      - description: user chinese name
+        in: query
+        name: name_cn
+        type: string
+      - description: system role activated
+        in: query
+        name: active
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list system user
+      tags:
+      - system
+    post:
+      parameters:
+      - description: user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SysUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add system user
+      tags:
+      - system
+    put:
+      parameters:
+      - description: update user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update system role
+      tags:
+      - system
+  /api/v1/users/{id}:
+    delete:
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del system user
       tags:
       - system
 produces:

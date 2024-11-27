@@ -15,7 +15,7 @@ var DB *gorm.DB
 
 // db connection
 func InitDB() {
-	conf := config.GlobalConfig.MysqlConfig
+	conf := config.GlobalConfig.Mysql
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=utf8&parseTime=True&loc=Local",
 		conf.User, conf.Passwd, conf.Host, conf.Port, conf.Database)
 	var err error
@@ -24,7 +24,7 @@ func InitDB() {
 		logrus.WithField("mysql", "init").Error(err)
 		os.Exit(1)
 	}
-	if config.GlobalConfig.AppConfig.Env == "dev" {
+	if config.GlobalConfig.App.Env == "dev" {
 		DB = DB.Debug()
 	}
 	db, _ := DB.DB()

@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/tswcbyy1107/dns-service/database"
+	"gorm.io/gorm"
 )
 
 const (
@@ -13,9 +14,9 @@ const (
 
 type SysRole struct {
 	BaseModel
-	Name   string        `gorm:"type:varchar(32) not null;index:idx_name" json:"name,omitempty" binding:"len>0"`
-	NameCn string        `gorm:"type:varchar(32) not null;index:idx_namecn" json:"name_cn,omitempty" binding:"len>0"`
-	ApiIds mySlice[uint] `gorm:"type:varchar(1024)" json:"api_ids,omitempty" binding:"gt > 0"`
+	Name   string        `gorm:"type:varchar(32) not null;index:idx_name" json:"name,omitempty" binding:"gt=0"`
+	NameCn string        `gorm:"type:varchar(32) not null;index:idx_namecn" json:"name_cn,omitempty" binding:"gt=0"`
+	ApiIds mySlice[uint] `gorm:"type:varchar(1024)" json:"api_ids,omitempty" binding:"gt=0"`
 
 	AccessibleApis []Api `gorm:"-" json:"accessible_apis,omitempty"`
 }
@@ -28,7 +29,7 @@ func (r *SysRole) ApiDetails() (err error) {
 	if r.Name == SuperAdmin {
 		db = db.Where("id > 0")
 	} else {
-		db = db.Where("id in (?)", r.ApiIds)
+		db = db.Where("id in (?)", []uint(r.ApiIds))
 	}
 
 	err = db.Find(&accessibleApis).Error
@@ -37,4 +38,32 @@ func (r *SysRole) ApiDetails() (err error) {
 	}
 	r.AccessibleApis = accessibleApis
 	return
+}
+
+func DelSysRole(roleID uint) error {
+	db := database.DB
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		// soft del role
+		err := db.Model(&SysRole{}).Where("id = ?", roleID).Update("deleted", true).Error
+		if err != nil {
+			return err
+		}
+
+		// update user
+		users := []SysUser{}
+		err = db.Where(ColumnContains("role_ids"), roleID).Find(&users).Error
+		if err != nil {
+			return err
+		}
+		for _, u := range users {
+			err := database.DB.Model(&u).Update("role_ids", u.RoleIds.Del(roleID)).Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	return err
 }

@@ -38,6 +38,7 @@ func LogHandler() gin.HandlerFunc {
 		requestBodyString = strings.Replace(requestBodyString, "\n", "", -1)
 		requestBodyString = strings.Replace(requestBodyString, "\t", "", -1)
 		requestBodyString = strings.Replace(requestBodyString, "\r", "", -1)
+		requestBodyString = strings.Replace(requestBodyString, " ", "", -1)
 
 		responseBody := "ignore response body"
 		if utils.Contains([]string{"PUT", "POST", "DELETE"}, c.Request.Method) {
@@ -46,6 +47,11 @@ func LogHandler() gin.HandlerFunc {
 				responseBody = responseBody[:1024] + "..."
 			}
 		}
+		responseBody = strings.Replace(responseBody, "\n", "", -1)
+		responseBody = strings.Replace(responseBody, "\t", "", -1)
+		responseBody = strings.Replace(responseBody, "\r", "", -1)
+		responseBody = strings.Replace(responseBody, " ", "", -1)
+
 		fields := map[string]interface{}{
 			"headers":       c.Request.Header,
 			"method":        c.Request.Method,

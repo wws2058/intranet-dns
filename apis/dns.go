@@ -7,14 +7,13 @@ import (
 	"github.com/tswcbyy1107/dns-service/models"
 )
 
-// @Summary      intranet dns crud
-// @Description  基于bind9 dns服务的针对dns的动态添加
-// @Production   json
-// @Production   json
-// @Tags         dns-operation
-// @Param        mock  query   string       false  "mock参数"
-// @Success      200   object  StdResponse  "测试接口"
-// @Router       /api/v1/dns [GET]
+// @Summary     intranet dns crud
+// @Production  json
+// @Production  json
+// @Tags        dns-operation
+// @Param       mock  query   string           false  "mock参数"
+// @Success     200   object  ctx.StdResponse  ”add   dns  record"
+// @Router      /api/v1/dns [GET]
 func addDns(c *gin.Context) {
 
 }

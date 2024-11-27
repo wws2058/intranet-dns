@@ -1,8 +1,8 @@
 package models
 
 import (
+	"fmt"
 	"reflect"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tswcbyy1107/dns-service/database"
@@ -10,8 +10,8 @@ import (
 )
 
 type PageReq struct {
-	Page     int `json:"page" form:"page" binding:"gte=1"`                    // page, start at 1
-	PageSize int `json:"page_size" form:"page_size" binding:"gte=1,lte=1000"` // page size, 1<=x<=1000
+	Page     int `json:"page" form:"page" binding:"gte=1"`                     // page, start at 1
+	PageSize int `json:"page_size" form:"page_size" binding:"gte=10,lte=1000"` // page size, 10<=x<=1000
 }
 
 // page query offset
@@ -36,10 +36,10 @@ type PageRsp struct {
 
 // base table model
 type BaseModel struct {
-	Id        uint                  `gorm:"primaryKey;autoIncrement" json:"id"`                    // primary id
-	CreatedAt time.Time             `gorm:"autoCreateTime;index:idx_created_at" json:"created_at"` // create time
-	UpdatedAt time.Time             `gorm:"autoUpdateTime;index:idx_updated_at" json:"updated_at"` // modified time
-	Deleted   soft_delete.DeletedAt `gorm:"softDelete:flag" json:"-" `                             // record is deleted, 0 false
+	Id        uint                  `gorm:"primaryKey;autoIncrement" json:"id"`                                  // primary id
+	CreatedAt JsonTime              `gorm:"type:datetime;autoCreateTime;index:idx_created_at" json:"created_at"` // create time
+	UpdatedAt JsonTime              `gorm:"type:datetime;autoUpdateTime;index:idx_updated_at" json:"updated_at"` // modified time
+	Deleted   soft_delete.DeletedAt `gorm:"softDelete:flag" json:"-" `                                           // record is deleted, 0 false
 }
 
 // common db dao request
@@ -158,10 +158,15 @@ func AutoMigrate() {
 		&Api{},
 		&DnsRecord{},
 		&SysRole{},
+		&SysUser{},
 	)
 	if err != nil {
 		logrus.WithField("mysql", "auto_migrate").Error(err)
 	} else {
 		logrus.WithField("mysql", "auto_migrate").Info("succeed")
 	}
+}
+
+func ColumnContains(column string) string {
+	return fmt.Sprintf("find_in_set(?, %v)", column)
 }

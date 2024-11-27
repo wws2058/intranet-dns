@@ -22,36 +22,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/api": {
-            "put": {
-                "description": "api's active and audit attributes",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "system"
-                ],
-                "summary": "update api",
-                "parameters": [
-                    {
-                        "description": "id: api db id; audit: true 1, request logged; active: true 1, in use",
-                        "name": "request",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/apis.updateApiReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "api updated",
-                        "schema": {
-                            "$ref": "#/definitions/apis.StdResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/apis": {
             "get": {
                 "description": "page query apis by params",
@@ -98,7 +68,35 @@ const docTemplate = `{
                     "200": {
                         "description": "apis",
                         "schema": {
-                            "$ref": "#/definitions/apis.StdResponse"
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "api's active and audit attributes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "update api",
+                "parameters": [
+                    {
+                        "description": "id: api db id; audit: true 1, request logged; active: true 1, in use",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/apis.updateApiReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "api updated",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
                         }
                     }
                 }
@@ -106,7 +104,6 @@ const docTemplate = `{
         },
         "/api/v1/dns": {
             "get": {
-                "description": "基于bind9 dns服务的针对dns的动态添加",
                 "tags": [
                     "dns-operation"
                 ],
@@ -121,9 +118,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "测试接口",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/apis.StdResponse"
+                            "$ref": "#/definitions/ctx.StdResponse"
                         }
                     }
                 }
@@ -147,7 +144,7 @@ const docTemplate = `{
                     "200": {
                         "description": "pong",
                         "schema": {
-                            "$ref": "#/definitions/apis.StdResponse"
+                            "$ref": "#/definitions/ctx.StdResponse"
                         }
                     }
                 }
@@ -187,7 +184,35 @@ const docTemplate = `{
                     "200": {
                         "description": "roles",
                         "schema": {
-                            "$ref": "#/definitions/apis.StdResponse"
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "update system role",
+                "parameters": [
+                    {
+                        "description": "role request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.updateRoleReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "role id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
                         }
                     }
                 }
@@ -199,7 +224,7 @@ const docTemplate = `{
                 "tags": [
                     "system"
                 ],
-                "summary": "add role",
+                "summary": "add system role",
                 "parameters": [
                     {
                         "description": "role request",
@@ -215,7 +240,7 @@ const docTemplate = `{
                     "200": {
                         "description": "role id",
                         "schema": {
-                            "$ref": "#/definitions/apis.StdResponse"
+                            "$ref": "#/definitions/ctx.StdResponse"
                         }
                     }
                 }
@@ -243,7 +268,7 @@ const docTemplate = `{
                     "200": {
                         "description": "role id",
                         "schema": {
-                            "$ref": "#/definitions/apis.StdResponse"
+                            "$ref": "#/definitions/ctx.StdResponse"
                         }
                     }
                 }
@@ -257,7 +282,7 @@ const docTemplate = `{
                 "tags": [
                     "system"
                 ],
-                "summary": "role detail",
+                "summary": "system role accessible apis",
                 "parameters": [
                     {
                         "type": "integer",
@@ -271,7 +296,142 @@ const docTemplate = `{
                     "200": {
                         "description": "role detail with accessible apis",
                         "schema": {
-                            "$ref": "#/definitions/apis.StdResponse"
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "list system user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page, min=1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size, min=10, max=1000",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "user role's id",
+                        "name": "role_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user chinese name",
+                        "name": "name_cn",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "system role activated",
+                        "name": "active",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "update system role",
+                "parameters": [
+                    {
+                        "description": "update user request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.updateUserReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "add system user",
+                "parameters": [
+                    {
+                        "description": "user request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SysUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "role id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "del system user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
                         }
                     }
                 }
@@ -279,30 +439,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "apis.StdResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "data"
-                },
-                "error": {
-                    "description": "self serr",
-                    "$ref": "#/definitions/models.Errors"
-                },
-                "pages": {
-                    "description": "pages",
-                    "$ref": "#/definitions/models.PageRsp"
-                },
-                "request_id": {
-                    "description": "api request uid",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "true: succeed, false: failed",
-                    "type": "boolean"
-                }
-            }
-        },
         "apis.updateApiReq": {
             "type": "object",
             "required": [
@@ -317,6 +453,85 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "apis.updateRoleReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "api_ids": {
+                    "description": "role accessible apis id",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "id": {
+                    "description": "role id",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "role en name",
+                    "type": "string"
+                },
+                "name_cn": {
+                    "description": "role cn name",
+                    "type": "string"
+                }
+            }
+        },
+        "apis.updateUserReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "active": {
+                    "description": "user is active",
+                    "type": "boolean"
+                },
+                "email": {
+                    "description": "user email address",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "id": {
+                    "description": "user id",
+                    "type": "integer"
+                },
+                "role_ids": {
+                    "description": "user roles",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "ctx.StdResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "data"
+                },
+                "error": {
+                    "description": "self err",
+                    "$ref": "#/definitions/models.Errors"
+                },
+                "pages": {
+                    "description": "pages",
+                    "$ref": "#/definitions/models.PageRsp"
+                },
+                "request_id": {
+                    "description": "api request uid",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "true: succeed, false: failed",
+                    "type": "boolean"
                 }
             }
         },
@@ -411,7 +626,55 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "description": "modified time",
+                    "description": "create time",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SysUser": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "description": "user is banned, active=0",
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "description": "create time",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "user email address",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "id": {
+                    "description": "primary id",
+                    "type": "integer"
+                },
+                "last_login": {
+                    "description": "create time",
+                    "type": "string"
+                },
+                "login_times": {
+                    "description": "user login times",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "user name",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "name_cn": {
+                    "description": "user cn name",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "role_ids": {
+                    "description": "user roles",
+                    "type": "object"
+                },
+                "updated_at": {
+                    "description": "create time",
                     "type": "string"
                 }
             }

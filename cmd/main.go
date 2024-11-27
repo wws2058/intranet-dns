@@ -11,7 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tswcbyy1107/dns-service/config"
 	"github.com/tswcbyy1107/dns-service/database"
-	"github.com/tswcbyy1107/dns-service/models"
 	"github.com/tswcbyy1107/dns-service/router"
 	"github.com/tswcbyy1107/dns-service/utils"
 )
@@ -58,5 +57,6 @@ func init() {
 
 	config.Init()
 	database.InitDB()
-	models.AutoMigrate()
+	database.InitRdb()
+	// models.AutoMigrate()
 }

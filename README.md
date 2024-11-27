@@ -1,11 +1,24 @@
 ## dns-service
 基于gin框架开发的内网dns管理系统后端demo, 支持动态dns修改. 提供dns解析的基础服务为bind.
 
-启动方式: `go run cmd/main.go`, [api详情](http://localhost:16789/swagger/index.html)
+启动方式: `go run cmd/main.go`, [本地swagger查看api详情](http://localhost:16789/swagger/index.html)
+
+项目项目结构如下:
+```bash
+```
+
+功能点介绍:
+- gin中间件: 日志记录, 标准response结构, api限流, jwt鉴权, api审计
+- 权限设计: rbac, 用户 -> 角色 -> api权限
+- 定时任务: 支持http, shell, function等定时任务的管理
+- dns管理: 动态dns协议增删改查dns记录
+- 多节点部署: go-redis
+
+表结构:
 
 
 ## 相关组件
-**golang**: gin, gorm, go-swagger, go-jwt
+**golang**: gin, gorm, go-swagger, go-jwt, go-redis
 
 **other**: mysql, redis, [bind9 doc](https://downloads.isc.org/isc/bind9/9.18.25/doc/arm/html/index.html)
 

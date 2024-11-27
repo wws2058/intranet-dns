@@ -44,7 +44,7 @@ func InitRouter() *http.Server {
 	models.ApisCleanInDB(ginApis)
 
 	srv := &http.Server{
-		Addr:           fmt.Sprintf(":%v", config.GlobalConfig.AppConfig.Port),
+		Addr:           fmt.Sprintf(":%v", config.GlobalConfig.App.Port),
 		Handler:        r,
 		ReadTimeout:    time.Second * 30,
 		WriteTimeout:   time.Second * 30,
