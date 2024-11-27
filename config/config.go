@@ -8,23 +8,30 @@ import (
 var GlobalConfig = new(Config)
 
 type Config struct {
-	AppConfig struct {
+	App struct {
 		Name string `ini:"name"`
 		Env  string `ini:"env"`
 		Port int    `ini:"port"`
 	} `ini:"app"`
-	MysqlConfig struct {
+	Mysql struct {
 		User     string `ini:"user"`
 		Host     string `ini:"host"`
 		Port     int    `ini:"port"`
 		Passwd   string `ini:"passwd"`
 		Database string `ini:"database"`
 	} `ini:"mysql"`
+	Redis struct {
+		Host     string `ini:"host"`
+		Port     int    `ini:"port"`
+		Passwd   string `ini:"passwd"`
+		Database int    `ini:"database"`
+	} `ini:"redis"`
 }
 
 // initialize global config
 func Init() {
 	config, err := ini.Load("./config/config.ini")
+	// config, err := ini.Load("../../config/config.ini")
 	if err != nil {
 		logrus.Errorf("load config.ini: %v", err)
 		return
