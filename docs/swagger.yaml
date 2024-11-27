@@ -38,7 +38,6 @@ definitions:
         type: boolean
       email:
         description: user email address
-        minLength: 1
         type: string
       id:
         description: user id
@@ -75,6 +74,9 @@ definitions:
         type: boolean
       audit:
         description: api is audited or not, 0 false
+        type: boolean
+      auth:
+        description: api requires auth
         type: boolean
       created_at:
         description: create time
@@ -230,6 +232,47 @@ paths:
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: update api
+      tags:
+      - system
+  /api/v1/audit_logs:
+    get:
+      parameters:
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: user name
+        in: query
+        name: user_name
+        type: string
+      - description: request uid
+        in: query
+        name: request_id
+        type: string
+      - description: remote ip
+        in: query
+        name: client_ip
+        type: string
+      - description: "2006-01-02 15:04:05"
+        in: query
+        name: start_time
+        type: string
+      - description: "2006-01-02 15:04:05"
+        in: query
+        name: end_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list system audit logs
       tags:
       - system
   /api/v1/dns:

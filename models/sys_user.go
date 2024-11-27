@@ -19,6 +19,8 @@ type SysUser struct {
 	LastLogin  JsonTime      `gorm:"type:datetime" json:"last_login,omitempty"`                                            // user last login at
 	LoginTimes int           `gorm:"type:int(10) default 0" json:"login_times,omitempty"`                                  // user login times
 	RoleIds    mySlice[uint] `gorm:"type:varchar(1024)" json:"role_ids,omitempty"`                                         // user roles
+	// Password   string        `gorm:"type:varchar(128) not null" json:"-"`                                                  // user password, sha256 encode
+	// TODO
 }
 
 // get role accessible active api path and method, subitem = path/method

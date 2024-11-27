@@ -1,16 +1,12 @@
 package middleware
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 )
 
-// auth
+// TODO
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
-		// TODO
-		fmt.Println(c.FullPath())
 	}
 }

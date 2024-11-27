@@ -156,6 +156,7 @@ func newModel(src interface{}) (interface{}, bool) {
 func AutoMigrate() {
 	err := database.DB.Set("gorm:table_options", "CHARSET=utf8mb4").AutoMigrate(
 		&Api{},
+		&AuditLog{},
 		&DnsRecord{},
 		&SysRole{},
 		&SysUser{},

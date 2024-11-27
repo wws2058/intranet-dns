@@ -1,21 +1,42 @@
 ## dns-service
-基于gin框架开发的内网dns管理系统后端demo, 支持动态dns修改. 提供dns解析的基础服务为bind.
+基于gin框架开发的内网dns管理系统后端demo, 支持动态dns修改. 提供dns解析的基础服务为bind. 支持多节点部署.
 
 启动方式: `go run cmd/main.go`, [本地swagger查看api详情](http://localhost:16789/swagger/index.html)
 
 项目项目结构如下:
 ```bash
+tree -d dns-service/
+dns-service/
+├── apis                # 控制器
+├── cmd                 # main.go
+├── config              # 配置文件
+├── ctx                 # gin上下文
+├── database            # 数据库初始化
+├── docs                # swagger
+├── lib                 # 依赖库
+│   ├── ansible
+│   └── redis           # redis: cache & lock
+├── middleware          # 中间件: 日志, 审计, 鉴权, 跨域等
+├── models              # 数据库表结构, dao函数
+├── router              # 路由控制
+├── service             # 服务代码
+└── utils               # 工具函数
 ```
 
-功能点介绍:
-- gin中间件: 日志记录, 标准response结构, api限流, jwt鉴权, api审计
-- 权限设计: rbac, 用户 -> 角色 -> api权限
-- 定时任务: 支持http, shell, function等定时任务的管理
-- dns管理: 动态dns协议增删改查dns记录
-- 多节点部署: go-redis
-
 表结构:
+```bash
+mysql> show tables;
++-----------------------+
+| Tables_in_dns_service |
++-----------------------+
+| apis                  |
+| dns_records           |
+| sys_roles             |
+| sys_users             |
++-----------------------+
+```
 
+功能点:
 
 ## 相关组件
 **golang**: gin, gorm, go-swagger, go-jwt, go-redis

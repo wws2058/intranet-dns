@@ -12,9 +12,10 @@ import (
 type Api struct {
 	BaseModel
 
-	Path        string `gorm:"type:varchar(256) not null;index:idx_api_method" json:"path,omitempty"`  // api path
+	Path        string `gorm:"type:varchar(256) not null;index:idx_api_path" json:"path,omitempty"`    // api path
 	Method      string `gorm:"type:varchar(16) not null;index:idx_api_method" json:"method,omitempty"` // api method
 	Description string `gorm:"type:varchar(256) not null" json:"description,omitempty"`                // api description
+	Auth        bool   `gorm:"type:tinyint(1) default true" json:"auth,omitempty"`                     // api requires auth
 	Active      bool   `gorm:"type:tinyint(1) default true" json:"active,omitempty"`                   // api is activated or not, 0 false
 	Audit       bool   `gorm:"type:tinyint(1) default true" json:"audit,omitempty"`                    // api is audited or not, 0 false
 

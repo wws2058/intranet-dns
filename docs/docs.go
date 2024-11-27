@@ -102,6 +102,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/audit_logs": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "list system audit logs",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "min=1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min=10, max=1000",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user name",
+                        "name": "user_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "request uid",
+                        "name": "request_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "remote ip",
+                        "name": "client_ip",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "2006-01-02 15:04:05",
+                        "name": "start_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "2006-01-02 15:04:05",
+                        "name": "end_time",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "role id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/dns": {
             "get": {
                 "tags": [
@@ -495,8 +558,7 @@ const docTemplate = `{
                 },
                 "email": {
                     "description": "user email address",
-                    "type": "string",
-                    "minLength": 1
+                    "type": "string"
                 },
                 "id": {
                     "description": "user id",
@@ -544,6 +606,10 @@ const docTemplate = `{
                 },
                 "audit": {
                     "description": "api is audited or not, 0 false",
+                    "type": "boolean"
+                },
+                "auth": {
+                    "description": "api requires auth",
                     "type": "boolean"
                 },
                 "created_at": {

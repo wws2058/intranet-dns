@@ -93,15 +93,15 @@ func updateApi(c *gin.Context) {
 		ctx.FailedRsp(c, models.ErrDbUpdate)
 		return
 	}
-	ctx.SucceedRsp(c, "ok", nil)
+	ctx.SucceedRsp(c, req.Id, nil)
 }
 
 // @Summary      list system roles
 // @Description  get all system roles in pages
 // @Tags     system
 // @Produce  json
-// @Param        page       query   int              false  "min=1"
-// @Param        page_size  query   int              false  "min=10, max=1000"
+// @Param    page        query   int              false  "min=1"
+// @Param    page_size   query   int              false  "min=10, max=1000"
 // @Param        name_cn    query   string           false  "role chinese name"
 // @Success      200        object  ctx.StdResponse  "roles"
 // @Router       /api/v1/roles [GET]
@@ -191,7 +191,7 @@ func delRole(c *gin.Context) {
 // @Tags     system
 // @Produce  json
 // @Param    request  body    models.SysRole   true  "role request"
-// @Success  200      object  ctx.StdResponse  "role id"
+// @Success  200         object  ctx.StdResponse  "role id"
 // @Router   /api/v1/roles [POST]
 func addRole(c *gin.Context) {
 	// name uniq_key
@@ -299,8 +299,8 @@ func listUser(c *gin.Context) {
 }
 
 // @Summary  del system user
-// @Tags         system
-// @Produce      json
+// @Tags     system
+// @Produce  json
 // @Param    id   path    int              true  "user id"
 // @Success  200  object  ctx.StdResponse  "user id"
 // @Router   /api/v1/users/{id} [DELETE]
@@ -388,6 +388,67 @@ func addUser(c *gin.Context) {
 	ctx.SucceedRsp(c, req.Id, nil)
 }
 
+// @Summary  list system audit logs
+// @Tags         system
+// @Produce      json
+// @Param        page       query   int              false  "min=1"
+// @Param        page_size  query   int              false  "min=10, max=1000"
+// @Param    user_name   query   string           false  "user name"
+// @Param    request_id  query   string           false  "request uid"
+// @Param    client_ip   query   string           false  "remote ip"
+// @Param    start_time  query   string           false  "2006-01-02 15:04:05"
+// @Param    end_time    query   string           false  "2006-01-02 15:04:05"
+// @Success  200      object  ctx.StdResponse  "role id"
+// @Router   /api/v1/audit_logs [GET]
+func listAuditLogs(c *gin.Context) {
+	var req struct {
+		UserName  string `form:"user_name"`
+		RequestID string `form:"request_id"`
+		ClientIP  string `form:"client_ip"`
+		StartTime string `form:"start_time"`
+		EndTime   string `form:"end_time"`
+		models.PageReq
+	}
+	if err := c.BindQuery(&req); err != nil {
+		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		return
+	}
+
+	logs := []models.AuditLog{}
+	filter := make(map[string]interface{})
+	where := make(map[string]interface{})
+	if len(req.UserName) > 0 {
+		filter["user_name"] = req.UserName
+	}
+	if len(req.RequestID) > 0 {
+		filter["request_id"] = req.RequestID
+	}
+	if len(req.ClientIP) > 0 {
+		filter["client_ip"] = req.ClientIP
+	}
+	if len(req.StartTime) > 0 {
+		where["created_at >= ?"] = req.StartTime
+	}
+	if len(req.EndTime) > 0 {
+		where["created_at <= ?"] = req.EndTime
+	}
+
+	pageQuery := &models.DaoDBReq{
+		PageReq:     models.PageReq{Page: req.Page, PageSize: req.PageSize},
+		PageRsp:     models.PageRsp{},
+		Dst:         &logs,
+		Where:       where,
+		ModelFilter: filter,
+		OrderBy:     "id desc",
+	}
+	err := models.TemPlatePageQuery(pageQuery)
+	if err != nil {
+		ctx.FailedRsp(c, models.ErrDbQuery)
+		return
+	}
+	ctx.SucceedRsp(c, logs, &pageQuery.PageRsp)
+}
+
 // api相关接口
 func LoadSysApis(r *gin.Engine) {
 	apis := []models.Api{
@@ -407,6 +468,9 @@ func LoadSysApis(r *gin.Engine) {
 		{Path: "/users", Method: http.MethodGet, Description: "列举系统用户", Handler: listUser},
 		{Path: "/users", Method: http.MethodPost, Description: "新增用户", Handler: addUser},
 		{Path: "/users", Method: http.MethodPut, Description: "更新用户", Handler: updateUser},
+
+		// system audit log
+		{Path: "/audit_logs", Method: http.MethodGet, Description: "接口审计日志查询", Handler: listAuditLogs},
 	}
 	loadApi(r, ginGroupApiV1, apis)
 }
