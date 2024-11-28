@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/tswcbyy1107/dns-service/database"
@@ -20,8 +19,7 @@ func Cache(key string, value interface{}, ttl time.Duration) error {
 	defer cancel()
 
 	bytes, _ := json.Marshal(value)
-	result, err := database.Rdb.Set(ctx, key, string(bytes), ttl).Result()
-	fmt.Println("cache:", result, err)
+	_, err := database.Rdb.Set(ctx, key, string(bytes), ttl).Result()
 	return err
 }
 

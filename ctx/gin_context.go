@@ -2,19 +2,41 @@ package ctx
 
 import "github.com/gin-gonic/gin"
 
-// 设置gin request请求context, 通过gin.Context暂存的在每个请求生命周期内有效的数据
+// set gin context data
 
 const (
 	prefix       = "dns-service_"
 	keyRequestID = prefix + "request-id"
+	keySecretApi = prefix + "sensitive-api"
+	keyUserName  = prefix + "user-name"
 )
 
-// 设置request id
+// set request id
 func SetRequestID(c *gin.Context, uuid string) {
 	c.Set(keyRequestID, uuid)
 }
 
-// 获取request id
+// get request id
 func GetRequestID(c *gin.Context) string {
 	return c.GetString(keyRequestID)
+}
+
+// set sensitive api
+func SetSensitiveApi(c *gin.Context) {
+	c.Set(keySecretApi, true)
+}
+
+// get sensitive api
+func GetSensitiveApi(c *gin.Context) bool {
+	return c.GetBool(keySecretApi)
+}
+
+// set username
+func SetLoginUsername(c *gin.Context, name string) {
+	c.Set(keyUserName, name)
+}
+
+// get username
+func GetLoginUsername(c *gin.Context) string {
+	return c.GetString(keyUserName)
 }

@@ -4,14 +4,14 @@ import "github.com/gin-gonic/gin"
 
 // common request interface
 type IRequest interface {
-	ParseRequest() *Errors
-	DBOperation() *Errors
-	ExtraOperation() *Errors
-	GetResponse() (interface{}, *Errors)
+	ParseRequest() error
+	DBOperation() error
+	ExtraOperation() error
+	GetResponse() (interface{}, error)
 }
 
 // handle common request interface
-func ProcessRequest(req IRequest) (interface{}, *Errors) {
+func ProcessRequest(req IRequest) (interface{}, error) {
 	if errs := req.ParseRequest(); errs != nil {
 		return nil, errs
 	}
