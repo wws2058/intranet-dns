@@ -1,20 +1,20 @@
-package models
+package ctx
 
 import "fmt"
 
 // self errors
 
-// db errors
 var (
+	// db errors
 	ErrDbQuery       = &Errors{Code: 1001001, Message: "DB: Query DB Error"}
 	ErrDbUpdate      = &Errors{Code: 1001002, Message: "DB: Update DB Error"}
 	ErrDbInsert      = &Errors{Code: 1001003, Message: "DB: Insert DB Error"}
 	ErrDbTransaction = &Errors{Code: 1001004, Message: "DB: Transaction Failed"}
-)
-
-// system errors
-var (
-	ErrParams = &Errors{Code: 2001001, Message: "SYS: Invalid Params %v"}
+	// system errors
+	ErrParams     = &Errors{Code: 2001001, Message: "SYS: Invalid Params %v"}
+	ErrLogin      = &Errors{Code: 2001002, Message: "SYS: User Login Failure"}
+	ErrApi        = &Errors{Code: 2001003, Message: "SYS: Api Disabled"}
+	ErrPermission = &Errors{Code: 2001003, Message: "SYS: Permission Deny"}
 )
 
 type Errors struct {

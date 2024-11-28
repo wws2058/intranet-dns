@@ -161,6 +161,23 @@ func AutoMigrate() {
 		&SysRole{},
 		&SysUser{},
 	)
+
+	superAdminR := &SysRole{
+		Name:   SuperAdmin,
+		NameCn: "超级管理员",
+	}
+	database.DB.Create(superAdminR)
+
+	superUsers := &SysUser{
+		Name:     "app_manager",
+		NameCn:   "系统管理员",
+		Email:    "china.qq.com",
+		Password: "12345678",
+		RoleIds:  MySlice[uint]{superAdminR.Id},
+		Active:   true,
+	}
+	database.DB.Create(superUsers)
+
 	if err != nil {
 		logrus.WithField("mysql", "auto_migrate").Error(err)
 	} else {

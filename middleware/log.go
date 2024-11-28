@@ -22,16 +22,9 @@ func LogHandler() gin.HandlerFunc {
 		w := &responseBodyWriter{body: &bytes.Buffer{}, ResponseWriter: c.Writer}
 		c.Writer = w
 
-		originRequestBody, _ := io.ReadAll(c.Request.Body)
-		c.Request.Body = io.NopCloser(bytes.NewBuffer(originRequestBody))
-		requestBody := []byte("ignore request body")
-		if utils.Contains([]string{"PUT", "POST", "DELETE"}, c.Request.Method) && c.Request.Body != nil {
-			requestBody = originRequestBody
-		}
+		requestBody, _ := io.ReadAll(c.Request.Body)
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(requestBody))
 		requestBodyString := string(requestBody)
-		if len(requestBodyString) > 1024 {
-			requestBodyString = requestBodyString[:1024] + "..."
-		}
 		requestBodyString = strings.Replace(requestBodyString, "\n", "", -1)
 		requestBodyString = strings.Replace(requestBodyString, "\t", "", -1)
 		requestBodyString = strings.Replace(requestBodyString, "\r", "", -1)
@@ -40,28 +33,27 @@ func LogHandler() gin.HandlerFunc {
 		c.Next()
 		cost := time.Since(start)
 
-		responseBody := "ignore response body"
-		originResponseBody := w.body.String()
-		if utils.Contains([]string{"PUT", "POST", "DELETE"}, c.Request.Method) {
-			responseBody = originResponseBody
-			if len(responseBody) > 1024 {
-				responseBody = responseBody[:1024] + "..."
-			}
+		responseBodyString := w.body.String()
+		responseBodyString = strings.Replace(responseBodyString, "\n", "", -1)
+		responseBodyString = strings.Replace(responseBodyString, "\t", "", -1)
+		responseBodyString = strings.Replace(responseBodyString, "\r", "", -1)
+
+		// get sensitive mark, no log, no audit
+		if ctx.GetSensitiveApi(c) {
+			requestBodyString = "{}"
+			responseBodyString = "{}"
 		}
-		responseBody = strings.Replace(responseBody, "\n", "", -1)
-		responseBody = strings.Replace(responseBody, "\t", "", -1)
-		responseBody = strings.Replace(responseBody, "\r", "", -1)
 
 		fields := map[string]interface{}{
-			"headers":       c.Request.Header,
-			"method":        c.Request.Method,
-			"url":           c.Request.URL.String(),
-			"cost":          cost.Milliseconds(),
-			"status_code":   c.Writer.Status(),
-			"remote_ip":     c.ClientIP(),
-			"request_body":  requestBodyString,
-			"response_body": responseBody,
-			"request_id":    uid,
+			"method":      c.Request.Method,
+			"url":         c.Request.URL.String(),
+			"time_cost":   cost.Milliseconds(),
+			"status_code": c.Writer.Status(),
+			"remote_ip":   c.ClientIP(),
+			"request_id":  uid,
+			// "request_body":  requestBodyString,
+			// "response_body": responseBody,
+			// "headers": c.Request.Header,
 		}
 		// log and save audit log in db
 		go func() {
@@ -83,15 +75,15 @@ func LogHandler() gin.HandlerFunc {
 				return
 			}
 
-			// TODO
+			username := ctx.GetLoginUsername(c)
 			models.TemplateCreate(&models.AuditLog{
-				UserName:     "somebody",
+				UserName:     username,
 				RequestID:    uid,
 				ClientIP:     c.ClientIP(),
 				URL:          c.Request.URL.String(),
 				Method:       c.Request.Method,
-				RequestBody:  string(originRequestBody),
-				ResponseBody: originResponseBody,
+				RequestBody:  requestBodyString,
+				ResponseBody: responseBodyString,
 				TimeCost:     int(cost.Milliseconds()),
 			})
 		}()

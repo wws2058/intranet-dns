@@ -34,6 +34,12 @@ const docTemplate = `{
                 "summary": "list api",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
                         "type": "integer",
                         "description": "page, min=1",
                         "name": "page",
@@ -84,6 +90,12 @@ const docTemplate = `{
                 "summary": "update api",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
                         "description": "id: api db id; audit: true 1, request logged; active: true 1, in use",
                         "name": "request",
                         "in": "body",
@@ -112,6 +124,12 @@ const docTemplate = `{
                 ],
                 "summary": "list system audit logs",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "min=1",
@@ -225,6 +243,12 @@ const docTemplate = `{
                 "summary": "list system roles",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
                         "type": "integer",
                         "description": "min=1",
                         "name": "page",
@@ -262,6 +286,12 @@ const docTemplate = `{
                 "summary": "update system role",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
                         "description": "role request",
                         "name": "request",
                         "in": "body",
@@ -289,6 +319,12 @@ const docTemplate = `{
                 ],
                 "summary": "add system role",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
                     {
                         "description": "role request",
                         "name": "request",
@@ -320,6 +356,12 @@ const docTemplate = `{
                 "summary": "del role",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
                         "type": "integer",
                         "description": "role id",
                         "name": "id",
@@ -348,6 +390,12 @@ const docTemplate = `{
                 "summary": "system role accessible apis",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
                         "type": "integer",
                         "description": "role id",
                         "name": "id",
@@ -375,6 +423,12 @@ const docTemplate = `{
                 ],
                 "summary": "list system user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "page, min=1",
@@ -425,6 +479,12 @@ const docTemplate = `{
                 "summary": "update system role",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
                         "description": "update user request",
                         "name": "request",
                         "in": "body",
@@ -453,18 +513,54 @@ const docTemplate = `{
                 "summary": "add system user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
                         "description": "user request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SysUser"
+                            "$ref": "#/definitions/apis.newUser"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "role id",
+                        "description": "user id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "user login",
+                "parameters": [
+                    {
+                        "description": "user request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.userLoginInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -482,6 +578,12 @@ const docTemplate = `{
                 ],
                 "summary": "del system user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "user id",
@@ -502,6 +604,37 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "apis.newUser": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "user email address",
+                    "type": "string",
+                    "minLength": 5
+                },
+                "name": {
+                    "description": "user name",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 1
+                },
+                "name_cn": {
+                    "description": "user cn name",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "password": {
+                    "description": "user password, sha256 encode save",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 8
+                },
+                "role_ids": {
+                    "description": "user roles",
+                    "type": "object"
+                }
+            }
+        },
         "apis.updateApiReq": {
             "type": "object",
             "required": [
@@ -573,6 +706,23 @@ const docTemplate = `{
                 }
             }
         },
+        "apis.userLoginInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "user name",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 1
+                },
+                "password": {
+                    "description": "user password, sha256 encode save",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 8
+                }
+            }
+        },
         "ctx.StdResponse": {
             "type": "object",
             "properties": {
@@ -581,7 +731,7 @@ const docTemplate = `{
                 },
                 "error": {
                     "description": "self err",
-                    "$ref": "#/definitions/models.Errors"
+                    "type": "string"
                 },
                 "pages": {
                     "description": "pages",
@@ -638,19 +788,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Errors": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "self error code",
-                    "type": "integer"
-                },
-                "message": {
-                    "description": "self error message",
-                    "type": "string"
-                }
-            }
-        },
         "models.PageRsp": {
             "type": "object",
             "properties": {
@@ -690,54 +827,6 @@ const docTemplate = `{
                 },
                 "name_cn": {
                     "type": "string"
-                },
-                "updated_at": {
-                    "description": "create time",
-                    "type": "string"
-                }
-            }
-        },
-        "models.SysUser": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "description": "user is banned, active=0",
-                    "type": "boolean"
-                },
-                "created_at": {
-                    "description": "create time",
-                    "type": "string"
-                },
-                "email": {
-                    "description": "user email address",
-                    "type": "string",
-                    "minLength": 1
-                },
-                "id": {
-                    "description": "primary id",
-                    "type": "integer"
-                },
-                "last_login": {
-                    "description": "create time",
-                    "type": "string"
-                },
-                "login_times": {
-                    "description": "user login times",
-                    "type": "integer"
-                },
-                "name": {
-                    "description": "user name",
-                    "type": "string",
-                    "minLength": 1
-                },
-                "name_cn": {
-                    "description": "user cn name",
-                    "type": "string",
-                    "minLength": 1
-                },
-                "role_ids": {
-                    "description": "user roles",
-                    "type": "object"
                 },
                 "updated_at": {
                     "description": "create time",

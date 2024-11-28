@@ -14,9 +14,9 @@ const (
 
 type SysRole struct {
 	BaseModel
-	Name   string        `gorm:"type:varchar(32) not null;index:idx_name" json:"name,omitempty" binding:"gt=0"`
+	Name   string        `gorm:"type:varchar(32) not null;uniqueIndex:uk_name" json:"name,omitempty" binding:"gt=0"`
 	NameCn string        `gorm:"type:varchar(32) not null;index:idx_namecn" json:"name_cn,omitempty" binding:"gt=0"`
-	ApiIds mySlice[uint] `gorm:"type:varchar(1024)" json:"api_ids,omitempty" binding:"gt=0"`
+	ApiIds MySlice[uint] `gorm:"type:varchar(1024)" json:"api_ids,omitempty" binding:"gt=0"`
 
 	AccessibleApis []Api `gorm:"-" json:"accessible_apis,omitempty"`
 }

@@ -7,12 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tswcbyy1107/dns-service/ctx"
 	"github.com/tswcbyy1107/dns-service/models"
+	"github.com/tswcbyy1107/dns-service/service"
 )
 
 // @Summary      list api
 // @Description  page query apis by params
 // @Tags     system
 // @Produce  json
+// @Param        token      header  string           false  "min=1"
 // @Param        page       query   int              false  "page, min=1"
 // @Param        page_size  query   int              false  "page size, min=10, max=1000"
 // @Param        path       query   string           false  "api path"
@@ -28,7 +30,7 @@ func listApis(c *gin.Context) {
 		models.PageReq
 	}
 	if err := c.BindQuery(&req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
 
@@ -48,11 +50,11 @@ func listApis(c *gin.Context) {
 		PageRsp:     models.PageRsp{},
 		Dst:         &apis,
 		ModelFilter: filter,
-		OrderBy:     "id asc",
+		OrderBy:     "id desc",
 	}
 	err := models.TemPlatePageQuery(pageQuery)
 	if err != nil {
-		ctx.FailedRsp(c, models.ErrDbQuery)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, apis, &pageQuery.PageRsp)
@@ -68,13 +70,14 @@ type updateApiReq struct {
 // @Description  api's active and audit attributes
 // @Tags     system
 // @Produce  json
+// @Param        token    header  string           false  "min=1"
 // @Param        request  body    updateApiReq     false  "id: api db id; audit: true 1, request logged; active: true 1, in use"
 // @Success      200      object  ctx.StdResponse  "api updated"
 // @Router       /api/v1/apis [PUT]
 func updateApi(c *gin.Context) {
 	req := &updateApiReq{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
 	api := models.Api{
@@ -90,7 +93,7 @@ func updateApi(c *gin.Context) {
 		fields = append(fields, "active")
 	}
 	if err := models.TemplateUpdate(api, fields); err != nil {
-		ctx.FailedRsp(c, models.ErrDbUpdate)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, req.Id, nil)
@@ -100,6 +103,7 @@ func updateApi(c *gin.Context) {
 // @Description  get all system roles in pages
 // @Tags     system
 // @Produce  json
+// @Param        token      header  string           false  "min=1"
 // @Param    page        query   int              false  "min=1"
 // @Param    page_size   query   int              false  "min=10, max=1000"
 // @Param        name_cn    query   string           false  "role chinese name"
@@ -111,7 +115,7 @@ func listSysRoles(c *gin.Context) {
 		models.PageReq
 	}
 	if err := c.BindQuery(&req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
 
@@ -130,7 +134,7 @@ func listSysRoles(c *gin.Context) {
 	}
 	err := models.TemPlatePageQuery(pageQuery)
 	if err != nil {
-		ctx.FailedRsp(c, models.ErrDbQuery)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, roles, &pageQuery.PageRsp)
@@ -139,14 +143,15 @@ func listSysRoles(c *gin.Context) {
 // @Summary  system role accessible apis
 // @Tags     system
 // @Produce  json
-// @Param    id   path    int              true  "role id"
-// @Success  200  object  ctx.StdResponse  "role detail with accessible apis"
+// @Param    token  header  string           false  "min=1"
+// @Param    id     path    int              true   "role id"
+// @Success  200    object  ctx.StdResponse  "role detail with accessible apis"
 // @Router   /api/v1/roles/{id}/apis [GET]
 func roleDetail(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, "id required"))
+		ctx.FailedRsp(c, err)
 		return
 	}
 	filter := make(map[string]interface{})
@@ -157,11 +162,11 @@ func roleDetail(c *gin.Context) {
 		ModelFilter: filter,
 	}
 	if err := models.TemplateQuery(opt); err != nil {
-		ctx.FailedRsp(c, models.ErrDbQuery)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	if err := role.ApiDetails(); err != nil {
-		ctx.FailedRsp(c, models.ErrDbQuery)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, role, nil)
@@ -170,18 +175,19 @@ func roleDetail(c *gin.Context) {
 // @Summary  del role
 // @Tags     system
 // @Produce  json
-// @Param    id   path    int              true  "role id"
-// @Success  200  object  ctx.StdResponse  "role id"
+// @Param    token  header  string           false  "min=1"
+// @Param    id     path    int              true   "role id"
+// @Success  200    object  ctx.StdResponse  "role id"
 // @Router   /api/v1/roles/{id} [DELETE]
 func delRole(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, "id required"))
+		ctx.FailedRsp(c, err)
 		return
 	}
 	if err := models.DelSysRole(uint(id)); err != nil {
-		ctx.FailedRsp(c, models.ErrDbUpdate)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, id, nil)
@@ -190,18 +196,19 @@ func delRole(c *gin.Context) {
 // @Summary  add system role
 // @Tags     system
 // @Produce  json
-// @Param    request  body    models.SysRole   true  "role request"
+// @Param    token    header  string           false  "min=1"
+// @Param    request  body    models.SysRole   true   "role request"
 // @Success  200         object  ctx.StdResponse  "role id"
 // @Router   /api/v1/roles [POST]
 func addRole(c *gin.Context) {
 	// name uniq_key
 	req := &models.SysRole{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
 	if err := models.TemplateCreate(req); err != nil {
-		ctx.FailedRsp(c, models.ErrDbInsert)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, req.Id, nil)
@@ -217,13 +224,14 @@ type updateRoleReq struct {
 // @Summary  update system role
 // @Tags     system
 // @Produce  json
-// @Param    request  body    updateRoleReq    true  "role request"
+// @Param    token    header  string           false  "min=1"
+// @Param    request  body    updateRoleReq    true   "role request"
 // @Success  200      object  ctx.StdResponse  "role id"
 // @Router   /api/v1/roles [PUT]
 func updateRole(c *gin.Context) {
 	req := &updateRoleReq{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
 	role := &models.SysRole{
@@ -243,7 +251,7 @@ func updateRole(c *gin.Context) {
 		fields = append(fields, "api_ids")
 	}
 	if err := models.TemplateUpdate(role, fields); err != nil {
-		ctx.FailedRsp(c, models.ErrDbUpdate)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, req.Id, nil)
@@ -252,6 +260,7 @@ func updateRole(c *gin.Context) {
 // @Summary  list system user
 // @Tags     system
 // @Produce  json
+// @Param    token      header  string           false  "min=1"
 // @Param    page       query   int              false  "page, min=1"
 // @Param    page_size  query   int              false  "page size, min=10, max=1000"
 // @Param    role_id    query   int              false  "user role's id"
@@ -267,7 +276,7 @@ func listUser(c *gin.Context) {
 		models.PageReq
 	}
 	if err := c.BindQuery(&req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
 	filter := make(map[string]interface{})
@@ -288,11 +297,11 @@ func listUser(c *gin.Context) {
 		Dst:         &users,
 		ModelFilter: filter,
 		Where:       where,
-		OrderBy:     "id",
+		OrderBy:     "id desc",
 	}
 	err := models.TemPlatePageQuery(pageQuery)
 	if err != nil {
-		ctx.FailedRsp(c, models.ErrDbQuery)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, users, &pageQuery.PageRsp)
@@ -301,14 +310,15 @@ func listUser(c *gin.Context) {
 // @Summary  del system user
 // @Tags     system
 // @Produce  json
-// @Param    id   path    int              true  "user id"
-// @Success  200  object  ctx.StdResponse  "user id"
+// @Param    token  header  string           false  "min=1"
+// @Param    id     path    int              true   "user id"
+// @Success  200    object  ctx.StdResponse  "user id"
 // @Router   /api/v1/users/{id} [DELETE]
 func delUser(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, "id required"))
+		ctx.FailedRsp(c, err)
 		return
 	}
 	opt := models.DaoDBReq{
@@ -318,7 +328,7 @@ func delUser(c *gin.Context) {
 	}
 
 	if err := models.TemplateSoftDelete(opt); err != nil {
-		ctx.FailedRsp(c, models.ErrDbUpdate)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, id, nil)
@@ -332,15 +342,16 @@ type updateUserReq struct {
 }
 
 // @Summary  update system role
-// @Tags         system
-// @Produce      json
-// @Param    request  body    updateUserReq    true  "update user request"
+// @Tags     system
+// @Produce  json
+// @Param    token    header  string           false  "min=1"
+// @Param    request  body    updateUserReq    true   "update user request"
 // @Success  200      object  ctx.StdResponse  "user id"
 // @Router   /api/v1/users [PUT]
 func updateUser(c *gin.Context) {
 	req := &updateUserReq{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
 	user := &models.SysUser{
@@ -360,37 +371,94 @@ func updateUser(c *gin.Context) {
 		fields = append(fields, "role_ids")
 	}
 	if err := models.TemplateUpdate(user, fields); err != nil {
-		ctx.FailedRsp(c, models.ErrDbUpdate)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, req.Id, nil)
+}
+
+type newUser struct {
+	Name     string               `json:"name" binding:"min=1,max=20"`     // user name
+	Password string               `json:"password" binding:"min=8,max=20"` // user password, sha256 encode save
+	NameCn   string               `json:"name_cn" binding:"max=20"`        // user cn name
+	Email    string               `json:"email" binding:"min=5"`           // user email address
+	RoleIds  models.MySlice[uint] `json:"role_ids" binding:"min=1"`        // user roles
 }
 
 // @Summary  add system user
 // @Tags         system
 // @Produce      json
-// @Param    request  body    models.SysUser   true  "user request"
-// @Success  200      object  ctx.StdResponse  "role id"
+// @Param    token    header  string           false  "min=1"
+// @Param    request  body    newUser          true   "user request"
+// @Success  200      object  ctx.StdResponse  "user id"
 // @Router   /api/v1/users [POST]
 func addUser(c *gin.Context) {
 	// name uniq_key
-	req := &models.SysUser{
-		Active: true,
-	}
+	req := &newUser{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
-	if err := models.TemplateCreate(req); err != nil {
-		ctx.FailedRsp(c, models.ErrDbInsert)
+	newUser := &models.SysUser{
+		Name:     req.Name,
+		NameCn:   req.NameCn,
+		Password: req.Password,
+		Email:    req.Email,
+		RoleIds:  req.RoleIds,
+		Active:   true,
+	}
+	if err := models.TemplateCreate(newUser); err != nil {
+		ctx.FailedRsp(c, err)
 		return
 	}
-	ctx.SucceedRsp(c, req.Id, nil)
+	ctx.SetSensitiveApi(c)
+	ctx.SucceedRsp(c, newUser.Id, nil)
+}
+
+type userLoginInfo struct {
+	Name     string `json:"name" binding:"min=1,max=20"`     // user name
+	Password string `json:"password" binding:"min=8,max=20"` // user password, sha256 encode save
+}
+
+// @Summary  user login
+// @Tags         system
+// @Produce      json
+// @Param    request  body    userLoginInfo    true  "user request"
+// @Success  200      object  ctx.StdResponse  "user id"
+// @Router   /api/v1/users/login [POST]
+func userLogin(c *gin.Context) {
+	// name uniq_key
+	req := &userLoginInfo{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	user := &models.SysUser{
+		Name:     req.Name,
+		Password: req.Password,
+	}
+	user.Sha256Password()
+	dao := &models.DaoDBReq{
+		Dst:         user,
+		ModelFilter: user,
+	}
+	if err := models.TemplateQuery(dao); err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	ctx.SetSensitiveApi(c)
+	jwtToken, _ := service.GenJwtToken(user.Name)
+	ctx.SucceedRsp(c, map[string]interface{}{
+		"name":      user.Name,
+		"jwt_token": jwtToken,
+	}, nil)
+	go models.UpdateUserLoginInfo(user.Name)
 }
 
 // @Summary  list system audit logs
 // @Tags         system
 // @Produce      json
+// @Param    token       header  string           false  "min=1"
 // @Param        page       query   int              false  "min=1"
 // @Param        page_size  query   int              false  "min=10, max=1000"
 // @Param    user_name   query   string           false  "user name"
@@ -410,7 +478,7 @@ func listAuditLogs(c *gin.Context) {
 		models.PageReq
 	}
 	if err := c.BindQuery(&req); err != nil {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, err))
+		ctx.FailedRsp(c, err)
 		return
 	}
 
@@ -443,7 +511,7 @@ func listAuditLogs(c *gin.Context) {
 	}
 	err := models.TemPlatePageQuery(pageQuery)
 	if err != nil {
-		ctx.FailedRsp(c, models.ErrDbQuery)
+		ctx.FailedRsp(c, err)
 		return
 	}
 	ctx.SucceedRsp(c, logs, &pageQuery.PageRsp)
@@ -463,11 +531,12 @@ func LoadSysApis(r *gin.Engine) {
 		{Path: "/roles", Method: http.MethodPost, Description: "新增角色", Handler: addRole},
 		{Path: "/roles", Method: http.MethodPut, Description: "更新角色", Handler: updateRole},
 
-		// system use manage
+		// system user manage
 		{Path: "/users/:id", Method: http.MethodDelete, Description: "删除用户", Handler: delUser},
 		{Path: "/users", Method: http.MethodGet, Description: "列举系统用户", Handler: listUser},
 		{Path: "/users", Method: http.MethodPost, Description: "新增用户", Handler: addUser},
 		{Path: "/users", Method: http.MethodPut, Description: "更新用户", Handler: updateUser},
+		{Path: "/users/login", Method: http.MethodPost, Description: "用户登录", Handler: userLogin},
 
 		// system audit log
 		{Path: "/audit_logs", Method: http.MethodGet, Description: "接口审计日志查询", Handler: listAuditLogs},

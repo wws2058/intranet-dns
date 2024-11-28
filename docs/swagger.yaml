@@ -1,6 +1,30 @@
 consumes:
 - application/json
 definitions:
+  apis.newUser:
+    properties:
+      email:
+        description: user email address
+        minLength: 5
+        type: string
+      name:
+        description: user name
+        maxLength: 20
+        minLength: 1
+        type: string
+      name_cn:
+        description: user cn name
+        maxLength: 20
+        type: string
+      password:
+        description: user password, sha256 encode save
+        maxLength: 20
+        minLength: 8
+        type: string
+      role_ids:
+        description: user roles
+        type: object
+    type: object
   apis.updateApiReq:
     properties:
       active:
@@ -50,13 +74,26 @@ definitions:
     required:
     - id
     type: object
+  apis.userLoginInfo:
+    properties:
+      name:
+        description: user name
+        maxLength: 20
+        minLength: 1
+        type: string
+      password:
+        description: user password, sha256 encode save
+        maxLength: 20
+        minLength: 8
+        type: string
+    type: object
   ctx.StdResponse:
     properties:
       data:
         description: data
       error:
-        $ref: '#/definitions/models.Errors'
         description: self err
+        type: string
       pages:
         $ref: '#/definitions/models.PageRsp'
         description: pages
@@ -97,15 +134,6 @@ definitions:
         description: create time
         type: string
     type: object
-  models.Errors:
-    properties:
-      code:
-        description: self error code
-        type: integer
-      message:
-        description: self error message
-        type: string
-    type: object
   models.PageRsp:
     properties:
       page:
@@ -137,42 +165,6 @@ definitions:
         description: create time
         type: string
     type: object
-  models.SysUser:
-    properties:
-      active:
-        description: user is banned, active=0
-        type: boolean
-      created_at:
-        description: create time
-        type: string
-      email:
-        description: user email address
-        minLength: 1
-        type: string
-      id:
-        description: primary id
-        type: integer
-      last_login:
-        description: create time
-        type: string
-      login_times:
-        description: user login times
-        type: integer
-      name:
-        description: user name
-        minLength: 1
-        type: string
-      name_cn:
-        description: user cn name
-        minLength: 1
-        type: string
-      role_ids:
-        description: user roles
-        type: object
-      updated_at:
-        description: create time
-        type: string
-    type: object
 host: localhost:16789
 info:
   contact: {}
@@ -185,6 +177,10 @@ paths:
     get:
       description: page query apis by params
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: page, min=1
         in: query
         name: page
@@ -218,6 +214,10 @@ paths:
     put:
       description: api's active and audit attributes
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: 'id: api db id; audit: true 1, request logged; active: true 1,
           in use'
         in: body
@@ -237,6 +237,10 @@ paths:
   /api/v1/audit_logs:
     get:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: min=1
         in: query
         name: page
@@ -310,6 +314,10 @@ paths:
       description: get all system roles in pages
       parameters:
       - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: min=1
         in: query
         name: page
         type: integer
@@ -333,6 +341,10 @@ paths:
       - system
     post:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: role request
         in: body
         name: request
@@ -351,6 +363,10 @@ paths:
       - system
     put:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: role request
         in: body
         name: request
@@ -370,6 +386,10 @@ paths:
   /api/v1/roles/{id}:
     delete:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: role id
         in: path
         name: id
@@ -388,6 +408,10 @@ paths:
   /api/v1/roles/{id}/apis:
     get:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: role id
         in: path
         name: id
@@ -406,6 +430,10 @@ paths:
   /api/v1/users:
     get:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: page, min=1
         in: query
         name: page
@@ -438,17 +466,21 @@ paths:
       - system
     post:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: user request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.SysUser'
+          $ref: '#/definitions/apis.newUser'
       produces:
       - application/json
       responses:
         "200":
-          description: role id
+          description: user id
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: add system user
@@ -456,6 +488,10 @@ paths:
       - system
     put:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: update user request
         in: body
         name: request
@@ -475,6 +511,10 @@ paths:
   /api/v1/users/{id}:
     delete:
       parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
       - description: user id
         in: path
         name: id
@@ -488,6 +528,25 @@ paths:
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: del system user
+      tags:
+      - system
+  /api/v1/users/login:
+    post:
+      parameters:
+      - description: user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.userLoginInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: user login
       tags:
       - system
 produces:

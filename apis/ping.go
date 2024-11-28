@@ -15,11 +15,6 @@ import (
 // @Success     200   object  ctx.StdResponse  "pong"
 // @Router      /api/v1/ping [GET]
 func pingHandler(c *gin.Context) {
-	mock := c.DefaultQuery("mock", "true")
-	if mock == "false" {
-		ctx.FailedRsp(c, models.FormatErr(models.ErrParams, "mock"))
-		return
-	}
 	ctx.SucceedRsp(c, "pong", nil)
 }
 

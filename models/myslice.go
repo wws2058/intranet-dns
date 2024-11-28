@@ -4,21 +4,27 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/tswcbyy1107/dns-service/utils"
 )
 
 // self slice
-type mySlice[T uint | string] []T
+type MySlice[T uint | string] []T
+
+func (ms MySlice[T]) Len() int           { return len(ms) }
+func (ms MySlice[T]) Swap(i, j int)      { ms[i], ms[j] = ms[j], ms[i] }
+func (ms MySlice[T]) Less(i, j int) bool { return ms[i] < ms[j] }
 
 // go data -> db data, []slice -> x,y,z string
-func (ms mySlice[T]) Value() (driver.Value, error) {
+func (ms MySlice[T]) Value() (driver.Value, error) {
+	sort.Sort(ms)
 	return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(ms)), ","), "[]"), nil
 }
 
 // db data -> go data, x,y,z string -> []slice
-func (ms *mySlice[T]) Scan(value interface{}) error {
+func (ms *MySlice[T]) Scan(value interface{}) error {
 	if value == nil {
 		*ms = []T{}
 		return nil
@@ -34,8 +40,8 @@ func (ms *mySlice[T]) Scan(value interface{}) error {
 	return json.Unmarshal(bytes, ms)
 }
 
-func (m mySlice[T]) Del(value T) []T {
-	newS := mySlice[T]{}
+func (m MySlice[T]) Del(value T) []T {
+	newS := MySlice[T]{}
 	for _, sub := range m {
 		if value == sub {
 			continue
@@ -45,6 +51,6 @@ func (m mySlice[T]) Del(value T) []T {
 	return newS
 }
 
-func (m mySlice[T]) Contains(value T) bool {
+func (m MySlice[T]) Contains(value T) bool {
 	return utils.Contains[T](m, value)
 }
