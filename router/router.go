@@ -32,6 +32,7 @@ func InitRouter() *http.Server {
 	// load apis
 	apis.LoadPingApis(r)
 	apis.LoadSysApis(r)
+	apis.LoadCronjobApis(r)
 
 	// clean unused apis in db
 	ginApis := []models.Api{}

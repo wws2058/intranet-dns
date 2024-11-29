@@ -13,6 +13,7 @@ import (
 	"github.com/tswcbyy1107/dns-service/database"
 	"github.com/tswcbyy1107/dns-service/models"
 	"github.com/tswcbyy1107/dns-service/router"
+	"github.com/tswcbyy1107/dns-service/service/cronjob"
 	"github.com/tswcbyy1107/dns-service/utils"
 )
 
@@ -58,6 +59,6 @@ func init() {
 
 	config.Init()
 	database.InitDB()
-	database.InitRdb()
 	models.AutoMigrate()
+	cronjob.InitCronJob()
 }

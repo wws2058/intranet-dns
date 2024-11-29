@@ -44,6 +44,23 @@ func Contains[T comparable](as []T, sub T) bool {
 	return false
 }
 
+func RemoveRepeatedElement[T comparable](old []T) (new []T) {
+	new = make([]T, 0)
+	for i := 0; i < len(old); i++ {
+		repeat := false
+		for j := i + 1; j < len(old); j++ {
+			if old[i] == old[j] {
+				repeat = true
+				break
+			}
+		}
+		if !repeat {
+			new = append(new, old[i])
+		}
+	}
+	return
+}
+
 // hash string
 func Sha256Hash(origin string) (hash string) {
 	h := sha256.New()

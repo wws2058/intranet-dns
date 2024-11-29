@@ -183,6 +183,177 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/cronjobs": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cronjob"
+                ],
+                "summary": "list cronjob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page, min=1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size, min=10, max=1000",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "cronjob name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "cronjob creator",
+                        "name": "creator",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "cronjob type",
+                        "name": "task_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "cronjob started",
+                        "name": "started",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "cronjob last running status",
+                        "name": "last_succeed",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "users",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cronjob"
+                ],
+                "summary": "update cronjob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "description": "update cronjob request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.updateCronjobReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "cronjob id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cronjob"
+                ],
+                "summary": "add cronjob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "description": "cronjob request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.newCronjob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "cronjob id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cronjobs/{id}": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cronjob"
+                ],
+                "summary": "del cronjob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "cronjob id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "cronjob id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/dns": {
             "get": {
                 "tags": [
@@ -604,6 +775,32 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "apis.newCronjob": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "task desc",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "task name",
+                    "type": "string"
+                },
+                "spec": {
+                    "description": "spec \u0026 s m h D M W",
+                    "type": "string",
+                    "minLength": 9
+                },
+                "taskArgs": {
+                    "description": "task args",
+                    "$ref": "#/definitions/models.Args"
+                },
+                "taskType": {
+                    "description": "task type",
+                    "type": "string"
+                }
+            }
+        },
         "apis.newUser": {
             "type": "object",
             "properties": {
@@ -649,6 +846,38 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "apis.updateCronjobReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "description": {
+                    "description": "task desc",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "user id",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "task name",
+                    "type": "string"
+                },
+                "spec": {
+                    "description": "spec \u0026 s m h D M W",
+                    "type": "string"
+                },
+                "started": {
+                    "description": "task switch",
+                    "type": "boolean"
+                },
+                "task_args": {
+                    "description": "task args",
+                    "$ref": "#/definitions/models.Args"
                 }
             }
         },
@@ -784,6 +1013,19 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "description": "create time",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Args": {
+            "type": "object",
+            "properties": {
+                "function_name": {
+                    "description": "function name",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "http url",
                     "type": "string"
                 }
             }

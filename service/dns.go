@@ -4,3 +4,7 @@ package service
 func DynamicDns() {
 
 }
+
+func QueryDns() {
+	
+}

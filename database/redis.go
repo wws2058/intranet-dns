@@ -13,7 +13,7 @@ import (
 
 var Rdb *redis.Client
 
-func InitRdb() {
+func initRdb() {
 	Rdb = redis.NewClient(&redis.Options{
 		Addr:            fmt.Sprintf("%s:%v", config.GlobalConfig.Redis.Host, config.GlobalConfig.Redis.Port),
 		Password:        config.GlobalConfig.Redis.Passwd,

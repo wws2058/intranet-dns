@@ -1,6 +1,25 @@
 consumes:
 - application/json
 definitions:
+  apis.newCronjob:
+    properties:
+      description:
+        description: task desc
+        type: string
+      name:
+        description: task name
+        type: string
+      spec:
+        description: spec & s m h D M W
+        minLength: 9
+        type: string
+      taskArgs:
+        $ref: '#/definitions/models.Args'
+        description: task args
+      taskType:
+        description: task type
+        type: string
+    type: object
   apis.newUser:
     properties:
       email:
@@ -33,6 +52,29 @@ definitions:
         type: boolean
       id:
         type: integer
+    required:
+    - id
+    type: object
+  apis.updateCronjobReq:
+    properties:
+      description:
+        description: task desc
+        type: string
+      id:
+        description: user id
+        type: integer
+      name:
+        description: task name
+        type: string
+      spec:
+        description: spec & s m h D M W
+        type: string
+      started:
+        description: task switch
+        type: boolean
+      task_args:
+        $ref: '#/definitions/models.Args'
+        description: task args
     required:
     - id
     type: object
@@ -132,6 +174,15 @@ definitions:
         type: string
       updated_at:
         description: create time
+        type: string
+    type: object
+  models.Args:
+    properties:
+      function_name:
+        description: function name
+        type: string
+      url:
+        description: http url
         type: string
     type: object
   models.PageRsp:
@@ -279,6 +330,117 @@ paths:
       summary: list system audit logs
       tags:
       - system
+  /api/v1/cronjobs:
+    get:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: page, min=1
+        in: query
+        name: page
+        type: integer
+      - description: page size, min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: cronjob name
+        in: query
+        name: name
+        type: string
+      - description: cronjob creator
+        in: query
+        name: creator
+        type: string
+      - description: cronjob type
+        in: query
+        name: task_type
+        type: string
+      - description: cronjob started
+        in: query
+        name: started
+        type: boolean
+      - description: cronjob last running status
+        in: query
+        name: last_succeed
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list cronjob
+      tags:
+      - cronjob
+    post:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: cronjob request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newCronjob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cronjob id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add cronjob
+      tags:
+      - cronjob
+    put:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: update cronjob request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateCronjobReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cronjob id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update cronjob
+      tags:
+      - cronjob
+  /api/v1/cronjobs/{id}:
+    delete:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: cronjob id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cronjob id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del cronjob
+      tags:
+      - cronjob
   /api/v1/dns:
     get:
       parameters:

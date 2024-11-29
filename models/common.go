@@ -160,6 +160,7 @@ func AutoMigrate() {
 		&DnsRecord{},
 		&SysRole{},
 		&SysUser{},
+		&Cronjob{},
 	)
 
 	superAdminR := &SysRole{

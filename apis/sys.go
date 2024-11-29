@@ -517,7 +517,6 @@ func listAuditLogs(c *gin.Context) {
 	ctx.SucceedRsp(c, logs, &pageQuery.PageRsp)
 }
 
-// api相关接口
 func LoadSysApis(r *gin.Engine) {
 	apis := []models.Api{
 		// system api manage

@@ -23,7 +23,7 @@ func (j *JsonTime) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	t, err := time.ParseInLocation(timeStr, utils.DefaultTimeFormat, time.Local)
+	t, err := time.ParseInLocation(utils.DefaultTimeFormat, timeStr, time.Local)
 	if err != nil {
 		return err
 	}

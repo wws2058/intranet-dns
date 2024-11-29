@@ -7,7 +7,7 @@ import (
 
 	"github.com/tswcbyy1107/dns-service/config"
 	"github.com/tswcbyy1107/dns-service/database"
-	"github.com/tswcbyy1107/dns-service/lib/redis"
+	"github.com/tswcbyy1107/dns-service/service/redis"
 	"github.com/tswcbyy1107/dns-service/utils"
 	"gorm.io/gorm"
 )
