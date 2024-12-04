@@ -9,11 +9,11 @@ import (
 
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-	"github.com/tswcbyy1107/dns-service/config"
-	"github.com/tswcbyy1107/dns-service/database"
-	"github.com/tswcbyy1107/dns-service/models"
-	"github.com/tswcbyy1107/dns-service/service/redis"
-	"github.com/tswcbyy1107/dns-service/utils"
+	"github.com/tswcbyy1107/intranet-dns/config"
+	"github.com/tswcbyy1107/intranet-dns/database"
+	"github.com/tswcbyy1107/intranet-dns/models"
+	"github.com/tswcbyy1107/intranet-dns/service/redis"
+	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
 var (

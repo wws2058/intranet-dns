@@ -9,18 +9,15 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tswcbyy1107/dns-service/config"
-	"github.com/tswcbyy1107/dns-service/database"
-	"github.com/tswcbyy1107/dns-service/models"
-	"github.com/tswcbyy1107/dns-service/router"
-	"github.com/tswcbyy1107/dns-service/service/cronjob"
-	"github.com/tswcbyy1107/dns-service/utils"
+	"github.com/tswcbyy1107/intranet-dns/config"
+	"github.com/tswcbyy1107/intranet-dns/database"
+	"github.com/tswcbyy1107/intranet-dns/router"
+	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
-// @title        sre dns service backend demo
+// @title        sre intranet dns backend demo
 // @version      1.0
-// @description  simple intranet dns management system, dns crud operation with centos bind9
-// @host         localhost:16789
+// @description  simple intranet dns management system, dns crud operation with bind9
 // @accept       json
 // @produce      json
 // @schemes      http
@@ -59,6 +56,7 @@ func init() {
 
 	config.Init()
 	database.InitDB()
-	models.AutoMigrate()
-	cronjob.InitCronJob()
+	// TODO
+	// models.AutoMigrate()
+	// cronjob.InitCronJob()
 }

@@ -354,23 +354,201 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/dns": {
+        "/api/v1/dns/edns": {
             "get": {
-                "tags": [
-                    "dns-operation"
+                "produces": [
+                    "application/json"
                 ],
-                "summary": "intranet dns crud",
+                "tags": [
+                    "dns"
+                ],
+                "summary": "edns query",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "mock参数",
-                        "name": "mock",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "domain",
+                        "name": "domain",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "roles",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dns/isps": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "province isp ns ip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "isps",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dns/zones": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "list intranet dns zone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min=1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min=10, max=1000",
+                        "name": "page_size",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "roles",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "update intranet dns zone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "description": "update zone request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.updateZoneReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "add intranet dns zone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "description": "zone request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.newZone"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dns/zones/{id}": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "del intranet dns zone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -832,6 +1010,31 @@ const docTemplate = `{
                 }
             }
         },
+        "apis.newZone": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "zone description",
+                    "type": "string"
+                },
+                "ns_address": {
+                    "description": "ns server ip:port",
+                    "type": "string"
+                },
+                "tsig_name": {
+                    "description": "tsig key name",
+                    "type": "string"
+                },
+                "tsig_secret": {
+                    "description": "ns dynamic update key, to be encoded",
+                    "type": "string"
+                },
+                "zone": {
+                    "description": "ns name zone name FQDN",
+                    "type": "string"
+                }
+            }
+        },
         "apis.updateApiReq": {
             "type": "object",
             "required": [
@@ -932,6 +1135,32 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "apis.updateZoneReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ns_address": {
+                    "type": "string"
+                },
+                "tsig_name": {
+                    "type": "string"
+                },
+                "tsig_secret": {
+                    "type": "string"
+                },
+                "zone": {
+                    "type": "string"
                 }
             }
         },
@@ -1082,11 +1311,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:16789",
+	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{"http"},
-	Title:            "sre dns service backend demo",
-	Description:      "simple intranet dns management system, dns crud operation with centos bind9",
+	Title:            "sre intranet dns backend demo",
+	Description:      "simple intranet dns management system, dns crud operation with bind9",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

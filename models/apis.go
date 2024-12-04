@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tswcbyy1107/dns-service/database"
+	"github.com/tswcbyy1107/intranet-dns/database"
 )
 
 // api

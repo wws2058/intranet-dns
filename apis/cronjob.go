@@ -7,10 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
 
-	"github.com/tswcbyy1107/dns-service/ctx"
-	"github.com/tswcbyy1107/dns-service/models"
-	"github.com/tswcbyy1107/dns-service/service/cronjob"
-	"github.com/tswcbyy1107/dns-service/utils"
+	"github.com/tswcbyy1107/intranet-dns/ctx"
+	"github.com/tswcbyy1107/intranet-dns/models"
+	"github.com/tswcbyy1107/intranet-dns/service/cronjob"
+	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
 type newCronjob struct {

@@ -1,13 +1,14 @@
 package apis
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tswcbyy1107/dns-service/ctx"
-	"github.com/tswcbyy1107/dns-service/models"
-	"github.com/tswcbyy1107/dns-service/service"
+	"github.com/tswcbyy1107/intranet-dns/ctx"
+	"github.com/tswcbyy1107/intranet-dns/models"
+	"github.com/tswcbyy1107/intranet-dns/service"
 )
 
 // @Summary      list api
@@ -447,6 +448,10 @@ func userLogin(c *gin.Context) {
 		return
 	}
 	ctx.SetSensitiveApi(c)
+	if !user.Active {
+		ctx.FailedRsp(c, fmt.Errorf("user is inactive"))
+		return
+	}
 	jwtToken, _ := service.GenJwtToken(user.Name)
 	ctx.SucceedRsp(c, map[string]interface{}{
 		"name":      user.Name,

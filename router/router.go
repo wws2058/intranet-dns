@@ -9,12 +9,12 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"github.com/tswcbyy1107/dns-service/apis"
-	"github.com/tswcbyy1107/dns-service/config"
-	"github.com/tswcbyy1107/dns-service/middleware"
-	"github.com/tswcbyy1107/dns-service/models"
+	"github.com/tswcbyy1107/intranet-dns/apis"
+	"github.com/tswcbyy1107/intranet-dns/config"
+	"github.com/tswcbyy1107/intranet-dns/middleware"
+	"github.com/tswcbyy1107/intranet-dns/models"
 
-	_ "github.com/tswcbyy1107/dns-service/docs"
+	_ "github.com/tswcbyy1107/intranet-dns/docs"
 )
 
 func InitRouter() *http.Server {
@@ -33,6 +33,7 @@ func InitRouter() *http.Server {
 	apis.LoadPingApis(r)
 	apis.LoadSysApis(r)
 	apis.LoadCronjobApis(r)
+	apis.LoadDnsApis(r)
 
 	// clean unused apis in db
 	ginApis := []models.Api{}

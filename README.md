@@ -1,12 +1,12 @@
-## dns-service
-基于gin框架开发的内网dns管理系统后端demo, 支持动态dns修改. 提供dns解析的基础服务为bind. 支持多节点部署.
+## intranet dns
+基于gin框架开发的内网dns管理系统后端demo, 支持动态dns修改(RFC 2136标准). 提供dns解析的基础服务为bind. 支持多节点部署.
 
 启动方式: `go run cmd/main.go`, [本地swagger查看api详情](http://localhost:16789/swagger/index.html)
 
 项目项目结构如下:
 ```bash
-tree -d dns-service/
-dns-service/
+tree -d intranet-dns/
+intranet-dns/
 ├── apis                # 控制器
 ├── cmd                 # main.go
 ├── config              # 配置文件
@@ -37,129 +37,18 @@ mysql> show tables;
 ```
 
 功能点:
+- api管理: 路由自动录入数据库, 支持禁用单个api, 支持api限速, 接入go-swagger注解
+- 用户管理: 用户可绑定多个角色, 角色可绑定多个api接口, 实现rbac权限模型管控. 单个用户可禁用, 统计登录次数以及登录时间
+- 日志审计: os.stdout支持输出api访问日志, 包含来源ip、请求耗时等. 数据库存储具体的body日志用于审计 
+- 定时任务管理: 支持动态的增删改查定时任务, 定时任务可控制是否启动, 可查看最近的运行结果
+- dns管理: bind9+go miekg/dns实现dns动态增删改查(注意二级域和三级域的区分, 域名保持{name}.{zone格式}, 支持A AAAA CNAME记录). dns探测等
 
 ## 相关组件
-**golang**: gin, gorm, go-swagger, go-jwt, go-redis
+**golang**: gin, gorm, go-swagger, go-jwt, go-redis, miekg/dns
 
-**other**: mysql, redis, [bind9 doc](https://downloads.isc.org/isc/bind9/9.18.25/doc/arm/html/index.html)
+**database**: mysql, redis
 
-bind9安装和TSIG key配置:
+**nameserver**: [dns和bind](https://www.junmajinlong.com/linux/dns_bind/index.html), [bind key配置](https://www.cnblogs.com/RichardLuo/p/DNS_P3.html)
 ```bash
-yum install bind
-mkdir -p /var/named
-chown -R named.named /var/named
-tsig-keygen dns-service > /etc/named/dns-service.key
 
-# 编辑key以及其他配置
-vim /etc/named.conf
-systemctl start named
 ```
-
-<details><summary>bind9配置</summary>
-
-```bash
-# 主配置
-cat /etc/named.conf
-acl trust {
-     127.0.0.1/32;
-     172.24.8.122/32;
-     10.89.254.10/32;
-};
-
-acl server_master {
-    172.24.8.122;
-};
-
-options {
-    directory "/var/named";
-    dump-file "/var/named/data/cache_dump.db";
-    recursion yes;
-    version "MediaV DNS 1.0";
-    auth-nxdomain no;
-    zone-statistics yes;
-    statistics-file "/var/named/data/named_stats.txt";
-    listen-on-v6 { none; };
-    allow-recursion { trust; };
-    max-recursion-queries 100;
-};
-
-include "/etc/rndc.key";
-include "/etc/named.rfc1912.zones";
-include "/etc/named.root.key";
-include "/etc/named/dns-service.key";
-
-controls {
-	inet 127.0.0.1 port 953
- 	allow { 127.0.0.1; } keys { "rndc-key"; };
-};
-
-logging {
-    channel query_log {
-        file "/data0/log/named/query.log"  versions 10 size 100m;
-        severity        info;
-        print-time        yes;
-        print-category yes;
-    };
-    category queries {
-        query_log;
-    };
-
-    channel update_log {
-        file "/data0/log/named/update.log"  versions 10 size 100m;
-        severity        info;
-        print-time        yes;
-        print-category yes;
-    };
-    category update {
-        update_log;
-    };
-
-    channel general_log {
-        file "/data0/log/named/general.log"  versions 10 size 100m;
-        severity        info;
-        print-time        yes;
-        print-category yes;
-    };
-    category general { general_log; };
-
-    channel xfer_log {
-         file "/data0/log/named/xfer.log" versions 10 size 100m;
-         severity info;
-         print-category yes;
-         print-severity yes;
-         print-time yes;
-    };
-    category xfer-in { xfer_log; };
-    category xfer-out { xfer_log; };
-};
-
-zone "." IN {
-	type hint;
-	file "named.ca";
-};
-
-zone "test.com" {
-	type master;
-	file "test.com.zone";
-	allow-query { trust; };
-	allow-update { key dns-service; };
-};
-
-# 测试zone配置
-cat /var/named/test.com.zone
-$ORIGIN .
-$TTL 86400	; 1 day
-test.com		IN SOA	ns1.test.com. admin.test.com. (
-				2020021392 ; serial
-				1800       ; refresh (30 minutes)
-				600        ; retry (10 minutes)
-				2592000    ; expire (4 weeks 2 days)
-				3600       ; minimum (1 hour)
-				)
-			NS	ns1.test.com.
-
-$ORIGIN test.com.
-$TTL 60	; 1 minute
-ns1 A 172.24.8.122
-```
-</details>

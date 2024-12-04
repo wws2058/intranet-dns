@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tswcbyy1107/dns-service/database"
+	"github.com/tswcbyy1107/intranet-dns/database"
 	"gorm.io/plugin/soft_delete"
 )
 
@@ -157,27 +157,39 @@ func AutoMigrate() {
 	err := database.DB.Set("gorm:table_options", "CHARSET=utf8mb4").AutoMigrate(
 		&Api{},
 		&AuditLog{},
-		&DnsRecord{},
 		&SysRole{},
 		&SysUser{},
 		&Cronjob{},
+		&DnsRecord{},
+		&DnsZone{},
 	)
 
-	superAdminR := &SysRole{
-		Name:   SuperAdmin,
-		NameCn: "超级管理员",
-	}
-	database.DB.Create(superAdminR)
-
-	superUsers := &SysUser{
-		Name:     "app_manager",
-		NameCn:   "系统管理员",
-		Email:    "china.qq.com",
-		Password: "12345678",
-		RoleIds:  MySlice[uint]{superAdminR.Id},
-		Active:   true,
-	}
-	database.DB.Create(superUsers)
+	// create demo role
+	// superAdminR := &SysRole{
+	// 	Name:   SuperAdmin,
+	// 	NameCn: "超级管理员",
+	// }
+	// database.DB.Create(superAdminR)
+	// create demo user
+	// superUsers := &SysUser{
+	// 	Name:     "somebody",
+	// 	NameCn:   "系统管理员",
+	// 	Email:    "china.qq.com",
+	// 	Password: "12345678",
+	// 	RoleIds:  MySlice[uint]{superAdminR.Id},
+	// 	Active:   true,
+	// }
+	// database.DB.Create(superUsers)
+	// create demo dns zone
+	// testZone := &DnsZone{
+	// 	Zone:        "test.com.",
+	// 	NsAddress:   "1.1.1.1:53",
+	// 	TsigName:    "key-name.",
+	// 	TsigSecret:  "secret",
+	// 	Description: "test zone",
+	// 	Creator:     "somebody",
+	// }
+	// database.DB.Create(testZone)
 
 	if err != nil {
 		logrus.WithField("mysql", "auto_migrate").Error(err)

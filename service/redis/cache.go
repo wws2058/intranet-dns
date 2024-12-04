@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/tswcbyy1107/dns-service/database"
+	"github.com/tswcbyy1107/intranet-dns/database"
 )
 
 // get cache

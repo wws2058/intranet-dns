@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tswcbyy1107/dns-service/utils"
+	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
 type JsonTime time.Time

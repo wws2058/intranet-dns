@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/tswcbyy1107/dns-service/utils"
+	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
 // self slice

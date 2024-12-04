@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/tswcbyy1107/dns-service/database"
-	"github.com/tswcbyy1107/dns-service/utils"
+	"github.com/tswcbyy1107/intranet-dns/database"
+	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
 // require defer UnLock

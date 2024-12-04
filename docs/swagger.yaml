@@ -44,6 +44,24 @@ definitions:
         description: user roles
         type: object
     type: object
+  apis.newZone:
+    properties:
+      description:
+        description: zone description
+        type: string
+      ns_address:
+        description: ns server ip:port
+        type: string
+      tsig_name:
+        description: tsig key name
+        type: string
+      tsig_secret:
+        description: ns dynamic update key, to be encoded
+        type: string
+      zone:
+        description: ns name zone name FQDN
+        type: string
+    type: object
   apis.updateApiReq:
     properties:
       active:
@@ -113,6 +131,23 @@ definitions:
         items:
           type: integer
         type: array
+    required:
+    - id
+    type: object
+  apis.updateZoneReq:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      ns_address:
+        type: string
+      tsig_name:
+        type: string
+      tsig_secret:
+        type: string
+      zone:
+        type: string
     required:
     - id
     type: object
@@ -216,12 +251,10 @@ definitions:
         description: create time
         type: string
     type: object
-host: localhost:16789
 info:
   contact: {}
-  description: simple intranet dns management system, dns crud operation with centos
-    bind9
-  title: sre dns service backend demo
+  description: simple intranet dns management system, dns crud operation with bind9
+  title: sre intranet dns backend demo
   version: "1.0"
 paths:
   /api/v1/apis:
@@ -441,21 +474,136 @@ paths:
       summary: del cronjob
       tags:
       - cronjob
-  /api/v1/dns:
+  /api/v1/dns/edns:
     get:
       parameters:
-      - description: mock参数
-        in: query
-        name: mock
+      - description: min=1
+        in: header
+        name: token
         type: string
+      - description: domain
+        in: query
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: OK
+          description: roles
           schema:
             $ref: '#/definitions/ctx.StdResponse'
-      summary: intranet dns crud
+      summary: edns query
       tags:
-      - dns-operation
+      - dns
+  /api/v1/dns/isps:
+    get:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: isps
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: province isp ns ip
+      tags:
+      - dns
+  /api/v1/dns/zones:
+    get:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: roles
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list intranet dns zone
+      tags:
+      - dns
+    post:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: zone request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newZone'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add intranet dns zone
+      tags:
+      - dns
+    put:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: update zone request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateZoneReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update intranet dns zone
+      tags:
+      - dns
+  /api/v1/dns/zones/{id}:
+    delete:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del intranet dns zone
+      tags:
+      - dns
   /api/v1/ping:
     get:
       parameters:
