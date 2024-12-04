@@ -5,7 +5,7 @@ import "github.com/gin-gonic/gin"
 // set gin context data
 
 const (
-	prefix       = "dns-service_"
+	prefix       = "intranet-dns_"
 	keyRequestID = prefix + "request-id"
 	keySecretApi = prefix + "sensitive-api"
 	keyUserName  = prefix + "user-name"

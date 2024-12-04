@@ -8,7 +8,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
-	"github.com/tswcbyy1107/dns-service/config"
+	"github.com/tswcbyy1107/intranet-dns/config"
 )
 
 var Rdb *redis.Client

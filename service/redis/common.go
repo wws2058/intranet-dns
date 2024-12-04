@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/tswcbyy1107/dns-service/database"
+	"github.com/tswcbyy1107/intranet-dns/database"
 )
 
 // k v string, json.Unmarshal to dst, dst is pointer
