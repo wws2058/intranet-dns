@@ -18,3 +18,9 @@ func testFunction() error {
 	}
 	return fmt.Errorf("%v is not even number", randomInt)
 }
+
+// ensure data consistency, db records with bind
+func syncDBRecordWithNsRR() (err error) {
+
+	return
+}
