@@ -1,10 +1,15 @@
 package models
 
-import "github.com/miekg/dns"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/miekg/dns"
+)
 
 // note: https://www.cnblogs.com/RichardLuo/p/DNS_P3.html
 
-// dns zone info, FQDN format
+// dns zone info, FQDN format, intranet second-level zone, eg test.com. company.net.  funny.cn.
 type DnsZone struct {
 	BaseModel
 
@@ -19,4 +24,20 @@ type DnsZone struct {
 func (d *DnsZone) SetFqdn() {
 	d.TsigName = dns.Fqdn(d.TsigName)
 	d.Zone = dns.Fqdn(d.Zone)
+}
+
+func (d *DnsZone) PreCheck() (err error) {
+	d.SetFqdn()
+	err = CheckZone(d.Zone)
+	return
+}
+
+// intranet second-level zone, eg test.com. company.net.  funny.cn.
+// zone + address uk column in db
+func CheckZone(zone string) (err error) {
+	zone = dns.Fqdn(zone)
+	if len(strings.Split(zone, ".")) != 3 {
+		return fmt.Errorf("illegal second-level zone formal")
+	}
+	return
 }

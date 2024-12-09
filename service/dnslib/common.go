@@ -10,8 +10,9 @@ import (
 )
 
 type EdnsRRs struct {
-	ISP    string         `json:"isp,omitempty"`
-	DnsRRs []models.DnsRR `json:"dns_rrs,omitempty"`
+	ISP      string         `json:"isp,omitempty"`
+	ClientIP string         `json:"client_ip,omitempty"`
+	DnsRRs   []models.DnsRR `json:"dns_rrs,omitempty"`
 }
 
 type ProvinceIspDns struct {

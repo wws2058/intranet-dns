@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/miekg/dns"
+	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
 /*
@@ -23,6 +24,10 @@ const (
 	NsType    = "NS"
 	SoaType   = "SOA"
 	MxType    = "MX"
+)
+
+var (
+	LegalDnsType = []string{AType, AAAAType, CnameType}
 )
 
 // dns rr in db , FQDN format
@@ -55,59 +60,60 @@ func (d *DnsRR) SetFqdn() {
 	}
 }
 
-// db dns record to dns dynamic dns rr, A AAAA CNMAE, A AAAA multiple content separated by ','
-func (d *DnsRR) ToDnsRRs() (rrs []dns.RR, err error) {
-	d.SetFqdn()
-
-	rrHeader := dns.RR_Header{
-		Name:  d.RecordName,
-		Class: dns.ClassINET,
-		Ttl:   uint32(d.RecordTtl),
+// db dns record to dns dynamic dns rr with check, A AAAA CNMAE, A AAAA multiple content separated by ','
+func (d *DnsRR) ToRRs() (rrs []dns.RR, err error) {
+	err = d.PreCheck()
+	if err != nil {
+		return
 	}
-	rrs = []dns.RR{}
-	switch d.RecordType {
-	case "A":
-		rrHeader.Rrtype = dns.TypeA
-		ips := strings.Split(d.RecordContent, ",")
-		for _, ipv4 := range ips {
-			rr := &dns.A{
-				A:   net.ParseIP(ipv4),
-				Hdr: rrHeader,
+
+	if d.RecordType == AAAAType || d.RecordType == AType {
+		ips := utils.RemoveRepeatedElement(strings.Split(d.RecordContent, ","))
+		for _, ip := range ips {
+			recordStr := fmt.Sprintf("%v %v IN %v %v", d.RecordName, d.RecordTtl, d.RecordType, ip)
+			rr, err := dns.NewRR(recordStr)
+			if err != nil {
+				return nil, err
 			}
 			rrs = append(rrs, rr)
 		}
-	case "CNAME":
-		rrHeader.Rrtype = dns.TypeCNAME
-		rrs = append(rrs, &dns.CNAME{
-			Target: d.RecordContent,
-			Hdr:    rrHeader,
-		})
-	case "AAAA":
-		rrHeader.Rrtype = dns.TypeAAAA
-		ips := strings.Split(d.RecordContent, ",")
-		for _, ipv6 := range ips {
-			rr := &dns.AAAA{
-				AAAA: net.ParseIP(ipv6),
-				Hdr:  rrHeader,
-			}
-			rrs = append(rrs, rr)
+	} else {
+		recordStr := fmt.Sprintf("%v %v IN %v %v", d.RecordName, d.RecordTtl, d.RecordType, d.RecordContent)
+		rr, err := dns.NewRR(recordStr)
+		if err != nil {
+			return nil, err
 		}
-	default:
-		err = fmt.Errorf("unsupported type:%s", d.RecordType)
+		rrs = append(rrs, rr)
 	}
 	return rrs, err
 }
 
 // intranet dns format: {name}.{zone}, name cannot contain dots [a-zA-Z0-9._+-]+$, check before add or update
-func (d *DnsRR) PreCheck() bool {
+// set Fqdn
+func (d *DnsRR) PreCheck() (err error) {
+	if d.RecordType == CnameType {
+		ip := net.ParseIP(d.RecordContent)
+		if ip != nil {
+			return fmt.Errorf("ip in CNAME type %v", ip.String())
+		}
+	}
+
 	d.SetFqdn()
+
+	if !utils.Contains(LegalDnsType, d.RecordType) {
+		return fmt.Errorf("illegal record type")
+	}
+	if err := CheckZone(d.Zone); err != nil {
+		return err
+	}
 	re := regexp.MustCompile(`^[a-zA-Z0-9._+-]+$`)
 	if !re.MatchString(d.RecordName) {
-		return false
+		err = fmt.Errorf("illegal record name str")
+		return
 	}
 	if !strings.HasSuffix(d.RecordName, d.Zone) {
-		return false
+		err = fmt.Errorf("record name and zonedo not match")
+		return
 	}
-	rName := strings.TrimRight(d.RecordName, d.Zone)
-	return len(strings.Split(rName, ".")) == 1
+	return
 }

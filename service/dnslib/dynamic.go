@@ -36,9 +36,8 @@ github: https://pkg.go.dev/github.com/miekg/dns@v1.1.48#section-readme
 */
 
 // intranet dns crud with bind dns server, action: add del modify del_all, timeout in 3s
-// CNAME, A , AAAA: AAAA A conflict CNAME
-func IntranetDynamicDns(record *models.DnsRR, action string) (err error) {
-	// get zone
+// CNAME, A , AAAA; AAAA A conflict CNAME
+func IntranetDynamicDns(record *models.DnsRR, updateRecord *models.DnsRR, action string) (err error) {
 	dnsZone := &models.DnsZone{}
 	if err := models.TemplateQuery(&models.DaoDBReq{
 		Dst:         dnsZone,
@@ -48,7 +47,7 @@ func IntranetDynamicDns(record *models.DnsRR, action string) (err error) {
 	}
 	dnsZone.SetFqdn()
 
-	rrs, err := record.ToDnsRRs()
+	rrs, err := record.ToRRs()
 	if err != nil {
 		return
 	}
@@ -58,12 +57,24 @@ func IntranetDynamicDns(record *models.DnsRR, action string) (err error) {
 	// msg.RRsetUsed(rrs)
 	switch action {
 	case "add":
-		// msg.NameNotUsed(rrs)
+		// if record.RecordType == models.CnameType {
+		// 	msg.NameNotUsed(rrs)
+		// }
+		// if record.RecordType == models.AAAAType || record.RecordType == models.AType {
+		// 	msg.RRsetNotUsed(rrs)
+		// }
 		msg.Insert(rrs)
 	case "del":
 		msg.Remove(rrs)
 	case "del_all":
 		msg.RemoveName(rrs)
+	case "modify":
+		upRRs, err := updateRecord.ToRRs()
+		if err != nil {
+			return err
+		}
+		msg.Insert(upRRs)
+		msg.Remove(rrs)
 	default:
 		return fmt.Errorf("unsupported action:%s", action)
 	}

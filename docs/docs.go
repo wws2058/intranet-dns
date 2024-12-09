@@ -415,6 +415,203 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/dns/records": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "list intranet dns",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min=1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min=10, max=1000",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "domain",
+                        "name": "record_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "record_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "data",
+                        "name": "record_content",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "roles",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "update intranet dns",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "description": "update dns request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dnslib.UpdateDnsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "add intranet dns",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "description": "dns request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.newDns"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "del intranet dns record",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "record id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "del all of the same type rrs",
+                        "name": "clean",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dns/rrs": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "intranet dns query",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "min=1",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "domain",
+                        "name": "domain",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "roles",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/dns/zones": {
             "get": {
                 "produces": [
@@ -979,6 +1176,26 @@ const docTemplate = `{
                 }
             }
         },
+        "apis.newDns": {
+            "type": "object",
+            "properties": {
+                "record_content": {
+                    "type": "string"
+                },
+                "record_name": {
+                    "type": "string"
+                },
+                "record_ttl": {
+                    "type": "integer"
+                },
+                "record_type": {
+                    "type": "string"
+                },
+                "zone": {
+                    "type": "string"
+                }
+            }
+        },
         "apis.newUser": {
             "type": "object",
             "properties": {
@@ -1202,6 +1419,26 @@ const docTemplate = `{
                 "status": {
                     "description": "true: succeed, false: failed",
                     "type": "boolean"
+                }
+            }
+        },
+        "dnslib.UpdateDnsReq": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "record_content": {
+                    "type": "string"
+                },
+                "record_name": {
+                    "type": "string"
+                },
+                "record_ttl": {
+                    "type": "integer"
                 }
             }
         },

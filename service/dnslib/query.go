@@ -7,7 +7,35 @@ import (
 
 	"github.com/miekg/dns"
 	"github.com/tswcbyy1107/intranet-dns/models"
+	"golang.org/x/sync/errgroup"
 )
+
+// query intranet dns A AAAA CNAME rr
+func IntranetRRQueryAll(domain, zone string) (rrs []models.DnsRR, err error) {
+	domain = dns.Fqdn(domain)
+	zone = dns.Fqdn(zone)
+
+	g := new(errgroup.Group)
+	ch := make(chan []models.DnsRR, len(models.LegalDnsType))
+	for _, t := range models.LegalDnsType {
+		g.Go(func() (err error) {
+			rrs, err := IntranetRRQuery(domain, zone, t)
+			if err != nil {
+				return
+			}
+			ch <- rrs
+			return
+		})
+	}
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+	close(ch)
+	for data := range ch {
+		rrs = append(rrs, data...)
+	}
+	return
+}
 
 // intranet dns query, xxx.baidu.com baidu.com A, without tsig
 func IntranetRRQuery(domain, zone, rtype string) (rrs []models.DnsRR, err error) {
@@ -41,10 +69,11 @@ func IntranetRRQuery(domain, zone, rtype string) (rrs []models.DnsRR, err error)
 		err = fmt.Errorf("no answer")
 		return
 	}
-	if dnsRsp.Rcode != dns.RcodeSuccess {
-		err = fmt.Errorf("dns failed rcode:%v", dns.RcodeToString[dnsRsp.Rcode])
-		return
-	}
+	// if dnsRsp.Rcode != dns.RcodeSuccess {
+	// 	rcode = dnsRsp.Rcode
+	// 	err = fmt.Errorf("dns failed rcode:%v", dns.RcodeToString[dnsRsp.Rcode])
+	// 	return
+	// }
 	for _, rr := range dnsRsp.Answer {
 		if rr.Header().Rrtype != rrType {
 			continue

@@ -48,7 +48,7 @@ mysql> show tables;
 
 **database**: mysql, redis
 
-**nameserver**: [dns和bind](https://www.junmajinlong.com/linux/dns_bind/index.html), [bind key配置](https://www.cnblogs.com/RichardLuo/p/DNS_P3.html)
+**nameserver**: [bind dynamic update](https://bind9.readthedocs.io/en/v9.16.18/advanced.html), [bind key配置](https://www.cnblogs.com/RichardLuo/p/DNS_P3.html)
 ```bash
 
 ```

@@ -20,6 +20,19 @@ definitions:
         description: task type
         type: string
     type: object
+  apis.newDns:
+    properties:
+      record_content:
+        type: string
+      record_name:
+        type: string
+      record_ttl:
+        type: integer
+      record_type:
+        type: string
+      zone:
+        type: string
+    type: object
   apis.newUser:
     properties:
       email:
@@ -180,6 +193,19 @@ definitions:
       status:
         description: 'true: succeed, false: failed'
         type: boolean
+    type: object
+  dnslib.UpdateDnsReq:
+    properties:
+      id:
+        type: integer
+      record_content:
+        type: string
+      record_name:
+        type: string
+      record_ttl:
+        type: integer
+    required:
+    - id
     type: object
   models.Api:
     properties:
@@ -511,6 +537,134 @@ paths:
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: province isp ns ip
+      tags:
+      - dns
+  /api/v1/dns/records:
+    delete:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: record id
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: del all of the same type rrs
+        in: query
+        name: clean
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del intranet dns record
+      tags:
+      - dns
+    get:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: domain
+        in: query
+        name: record_name
+        type: string
+      - description: type
+        in: query
+        name: record_type
+        type: string
+      - description: data
+        in: query
+        name: record_content
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: roles
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list intranet dns
+      tags:
+      - dns
+    post:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: dns request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newDns'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add intranet dns
+      tags:
+      - dns
+    put:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: update dns request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dnslib.UpdateDnsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update intranet dns
+      tags:
+      - dns
+  /api/v1/dns/rrs:
+    get:
+      parameters:
+      - description: min=1
+        in: header
+        name: token
+        type: string
+      - description: domain
+        in: query
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: roles
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: intranet dns query
       tags:
       - dns
   /api/v1/dns/zones:
