@@ -178,3 +178,39 @@ func PublicEDnsQueryRR(domain, clientIp string) (rrs []models.DnsRR, err error) 
 	}
 	return
 }
+
+// public dns 119.29.29.29 query
+func PublicDnsQueryRR(domain string) (rrs []models.DnsRR, err error) {
+	domain = dns.Fqdn(domain)
+	// public dns query rrType does not take effect, require A return all
+	rrType := RTypeStrToUint("A")
+
+	msg := &dns.Msg{}
+	// public dns query rrType does not take effect
+	msg.SetQuestion(domain, rrType)
+
+	dnsClient := &dns.Client{
+		Timeout: 2 * time.Second,
+	}
+
+	dnsRsp, _, err := dnsClient.Exchange(msg, "119.29.29.29:53")
+	if err != nil {
+		return
+	}
+	if dnsRsp == nil {
+		err = fmt.Errorf("no answer")
+		return
+	}
+	if dnsRsp.Rcode != dns.RcodeSuccess {
+		err = fmt.Errorf("dns failed rcode:%v", dns.RcodeToString[dnsRsp.Rcode])
+		return
+	}
+	for _, rr := range dnsRsp.Answer {
+		dnsRR, err := RRToDnsRR(rr, ".")
+		if err != nil {
+			continue
+		}
+		rrs = append(rrs, dnsRR)
+	}
+	return
+}

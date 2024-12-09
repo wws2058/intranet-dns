@@ -24,7 +24,6 @@ const docTemplate = `{
     "paths": {
         "/api/v1/apis": {
             "get": {
-                "description": "page query apis by params",
                 "produces": [
                     "application/json"
                 ],
@@ -35,7 +34,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -80,7 +79,6 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "api's active and audit attributes",
                 "produces": [
                     "application/json"
                 ],
@@ -91,12 +89,12 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
                     {
-                        "description": "id: api db id; audit: true 1, request logged; active: true 1, in use",
+                        "description": "req",
                         "name": "request",
                         "in": "body",
                         "schema": {
@@ -126,7 +124,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -175,7 +173,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "role id",
+                        "description": "audit logs",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -195,7 +193,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -231,7 +229,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "boolean",
-                        "description": "cronjob started",
+                        "description": "cronjob running status",
                         "name": "started",
                         "in": "query"
                     },
@@ -244,7 +242,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "users",
+                        "description": "cronjobs",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -262,7 +260,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -296,12 +294,12 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
                     {
-                        "description": "cronjob request",
+                        "description": "new cronjob request",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -312,7 +310,34 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "cronjob id",
+                        "description": "new cronjob id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cronjobs/functions": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cronjob"
+                ],
+                "summary": "list cronjob functions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "token",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "cronjob functions",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -332,7 +357,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -366,7 +391,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -380,7 +405,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "roles",
+                        "description": "rrs",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -400,7 +425,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     }
@@ -408,6 +433,159 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "isps",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dns/probes": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "list dns probe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min=1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min=10, max=1000",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "record name",
+                        "name": "record_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "record zone",
+                        "name": "zone",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "probes",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "update dns probe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "description": "req",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.updateProbeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "add dns probe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "description": "req",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.newProbe"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "probe id",
+                        "schema": {
+                            "$ref": "#/definitions/ctx.StdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dns/probes/{id}": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dns"
+                ],
+                "summary": "del dns probe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "token",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "probe id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "probe id",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -427,7 +605,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -464,7 +642,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "roles",
+                        "description": "dns records",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -482,7 +660,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -498,7 +676,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "user id",
+                        "description": "record id",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -516,7 +694,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -532,7 +710,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "user id",
+                        "description": "ok",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -550,7 +728,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -570,7 +748,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "user id",
+                        "description": "record id",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -590,7 +768,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -604,7 +782,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "roles",
+                        "description": "rrs",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -624,7 +802,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -643,7 +821,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "roles",
+                        "description": "zone",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -661,7 +839,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -677,7 +855,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "user id",
+                        "description": "zone id",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -695,7 +873,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -711,7 +889,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "user id",
+                        "description": "zone id",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -731,13 +909,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
                     {
                         "type": "integer",
-                        "description": "user id",
+                        "description": "zone id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -745,7 +923,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "user id",
+                        "description": "zone id",
                         "schema": {
                             "$ref": "#/definitions/ctx.StdResponse"
                         }
@@ -758,7 +936,7 @@ const docTemplate = `{
                 "tags": [
                     "health"
                 ],
-                "summary": "service ping api",
+                "summary": "ping",
                 "parameters": [
                     {
                         "type": "string",
@@ -779,7 +957,6 @@ const docTemplate = `{
         },
         "/api/v1/roles": {
             "get": {
-                "description": "get all system roles in pages",
                 "produces": [
                     "application/json"
                 ],
@@ -790,7 +967,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -833,7 +1010,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -867,7 +1044,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -903,7 +1080,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -937,7 +1114,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -971,7 +1148,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -1026,7 +1203,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -1060,7 +1237,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -1126,7 +1303,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "min=1",
+                        "description": "jwt token",
                         "name": "token",
                         "in": "header"
                     },
@@ -1189,6 +1366,23 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "record_type": {
+                    "type": "string"
+                },
+                "zone": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.newProbe": {
+            "type": "object",
+            "properties": {
+                "expect_answer": {
+                    "type": "object"
+                },
+                "intranet": {
+                    "type": "boolean"
+                },
+                "record_name": {
                     "type": "string"
                 },
                 "zone": {
@@ -1298,6 +1492,17 @@ const docTemplate = `{
                 "task_args": {
                     "description": "task args",
                     "$ref": "#/definitions/models.Args"
+                }
+            }
+        },
+        "apis.updateProbeReq": {
+            "type": "object",
+            "properties": {
+                "expect_answer": {
+                    "type": "object"
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         },

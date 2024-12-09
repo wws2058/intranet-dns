@@ -11,9 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tswcbyy1107/intranet-dns/config"
 	"github.com/tswcbyy1107/intranet-dns/database"
-	"github.com/tswcbyy1107/intranet-dns/models"
 	"github.com/tswcbyy1107/intranet-dns/router"
-	"github.com/tswcbyy1107/intranet-dns/service/cronjob"
 	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
@@ -58,6 +56,6 @@ func init() {
 
 	config.Init()
 	database.InitDB()
-	models.AutoMigrate()
-	cronjob.InitCronJob()
+	// models.AutoMigrate()
+	// cronjob.InitCronJob()
 }

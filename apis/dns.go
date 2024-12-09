@@ -25,9 +25,9 @@ type newZone struct {
 // @Summary  add intranet dns zone
 // @Tags     dns
 // @Produce  json
-// @Param    token    header  string               false  "min=1"
+// @Param    token    header  string               false  "jwt token"
 // @Param    request  body    newZone          true   "zone request"
-// @Success  200      object  ctx.StdResponse      "user id"
+// @Success  200      object  ctx.StdResponse  "zone id"
 // @Router   /api/v1/dns/zones [POST]
 func addZone(c *gin.Context) {
 	req := &newZone{}
@@ -62,9 +62,9 @@ func addZone(c *gin.Context) {
 // @Summary  del intranet dns zone
 // @Tags     dns
 // @Produce  json
-// @Param    token   header  string           false  "min=1"
-// @Param    id     path    int              true   "user id"
-// @Success  200    object  ctx.StdResponse  "user id"
+// @Param    token   header  string           false  "jwt token"
+// @Param    id     path    int              true   "zone id"
+// @Success  200    object  ctx.StdResponse  "zone id"
 // @Router   /api/v1/dns/zones/{id} [DELETE]
 func delZone(c *gin.Context) {
 	idStr := c.Param("id")
@@ -98,9 +98,9 @@ type updateZoneReq struct {
 // @Summary  update intranet dns zone
 // @Tags     dns
 // @Produce  json
-// @Param    token    header  string           false  "min=1"
+// @Param    token    header  string           false  "jwt token"
 // @Param    request  body    updateZoneReq    true   "update zone request"
-// @Success  200      object  ctx.StdResponse  "user id"
+// @Success  200      object  ctx.StdResponse  "zone id"
 // @Router   /api/v1/dns/zones [PUT]
 func updateZone(c *gin.Context) {
 	req := &updateZoneReq{}
@@ -146,10 +146,10 @@ func updateZone(c *gin.Context) {
 // @Summary  list intranet dns zone
 // @Tags     dns
 // @Produce  json
-// @Param    token  header  string           false  "min=1"
-// @Param    page            query   int              false  "min=1"
-// @Param    page_size       query   int              false  "min=10, max=1000"
-// @Success  200     object  ctx.StdResponse  "roles"
+// @Param    token  header  string           false  "jwt token"
+// @Param    page         query   int              false  "min=1"
+// @Param    page_size    query   int              false  "min=10, max=1000"
+// @Success  200        object  ctx.StdResponse  "zone"
 // @Router   /api/v1/dns/zones [GET]
 func listDnsZone(c *gin.Context) {
 	var req models.PageReq
@@ -176,13 +176,13 @@ func listDnsZone(c *gin.Context) {
 // @Summary  list intranet dns
 // @Tags     dns
 // @Produce  json
-// @Param    token           header  string           false  "min=1"
-// @Param    page       query   int              false  "min=1"
-// @Param    page_size  query   int              false  "min=10, max=1000"
+// @Param    token           header  string           false  "jwt token"
+// @Param    page            query   int              false  "min=1"
+// @Param    page_size       query   int              false  "min=10, max=1000"
 // @Param    record_name     query   string           false  "domain"
 // @Param    record_type     query   string           false  "type"
 // @Param    record_content  query   string           false  "data"
-// @Success  200             object  ctx.StdResponse  "roles"
+// @Success  200             object  ctx.StdResponse  "dns records"
 // @Router   /api/v1/dns/records [GET]
 func listDns(c *gin.Context) {
 	type r struct {
@@ -234,10 +234,10 @@ func listDns(c *gin.Context) {
 // @Summary  del intranet dns record
 // @Tags     dns
 // @Produce  json
-// @Param    token   header  string           false  "min=1"
+// @Param    token  header  string           false  "jwt token"
 // @Param    id     query   int              true   "record id"
 // @Param    clean  query   bool             false  "del all of the same type rrs"
-// @Success  200    object  ctx.StdResponse  "user id"
+// @Success  200    object  ctx.StdResponse  "record id"
 // @Router   /api/v1/dns/records [DELETE]
 func delDns(c *gin.Context) {
 	req := struct {
@@ -258,9 +258,9 @@ func delDns(c *gin.Context) {
 // @Summary  update intranet dns
 // @Tags     dns
 // @Produce  json
-// @Param    token    header  string           false  "min=1"
+// @Param    token    header  string           false  "jwt token"
 // @Param    request  body    dnslib.UpdateDnsReq  true   "update dns request"
-// @Success  200      object  ctx.StdResponse  "user id"
+// @Success  200      object  ctx.StdResponse      "record id"
 // @Router   /api/v1/dns/records [PUT]
 func updateDns(c *gin.Context) {
 	req := &dnslib.UpdateDnsReq{}
@@ -286,9 +286,9 @@ type newDns struct {
 // @Summary  add intranet dns
 // @Tags     dns
 // @Produce  json
-// @Param    token    header  string           false  "min=1"
+// @Param    token    header  string           false  "jwt token"
 // @Param    request  body    newDns           true   "dns request"
-// @Success  200      object  ctx.StdResponse  "user id"
+// @Success  200      object  ctx.StdResponse  "ok"
 // @Router   /api/v1/dns/records [POST]
 func addDns(c *gin.Context) {
 	req := &newDns{}
@@ -314,9 +314,9 @@ func addDns(c *gin.Context) {
 // @Summary  intranet dns query
 // @Tags     dns
 // @Produce  json
-// @Param    token  header  string           false  "min=1"
+// @Param    token   header  string           false  "jwt token"
 // @Param    domain  query   string           true   "domain"
-// @Success  200     object  ctx.StdResponse  "roles"
+// @Success  200     object  ctx.StdResponse  "rrs"
 // @Router   /api/v1/dns/rrs [GET]
 func dnsQuery(c *gin.Context) {
 	domain := strings.TrimSpace(c.Query("domain"))
@@ -335,9 +335,9 @@ func dnsQuery(c *gin.Context) {
 // @Summary  edns query
 // @Tags     dns
 // @Produce  json
-// @Param    token  header  string           false  "min=1"
+// @Param    token  header  string           false  "jwt token"
 // @Param    domain  query   string           true   "domain"
-// @Success  200        object  ctx.StdResponse  "roles"
+// @Success  200     object  ctx.StdResponse  "rrs"
 // @Router   /api/v1/dns/edns [GET]
 func ednsQuery(c *gin.Context) {
 	domain := strings.TrimSpace(c.Query("domain"))
@@ -375,11 +375,162 @@ func ednsQuery(c *gin.Context) {
 // @Summary  province isp ns ip
 // @Tags     dns
 // @Produce  json
-// @Param    token      header  string           false  "min=1"
+// @Param    token      header  string           false  "jwt token"
 // @Success  200    object  ctx.StdResponse  "isps"
 // @Router   /api/v1/dns/isps [GET]
 func getIsps(c *gin.Context) {
 	ctx.SucceedRsp(c, dnslib.PublicDnsIP, nil)
+}
+
+// @Summary  list dns probe
+// @Tags     dns
+// @Produce  json
+// @Param    token        header  string           false  "jwt token"
+// @Param    page       query   int              false  "min=1"
+// @Param    page_size  query   int              false  "min=10, max=1000"
+// @Param    record_name  query   string           false  "record name"
+// @Param    zone         query   string           false  "record zone"
+// @Success  200          object  ctx.StdResponse  "probes"
+// @Router   /api/v1/dns/probes [GET]
+func listDnsProbes(c *gin.Context) {
+	type r struct {
+		RecordName string `form:"record_name" json:"record_name,omitempty"`
+		Zone       string `form:"zone" json:"zone,omitempty"`
+		models.PageReq
+	}
+	req := r{}
+	if err := c.BindQuery(&req); err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+
+	filter := make(map[string]interface{})
+	if len(req.RecordName) > 0 {
+		filter["record_name"] = dns.Fqdn(req.RecordName)
+	}
+	if len(req.Zone) > 0 {
+		filter["zone"] = dns.Fqdn(req.Zone)
+	}
+	probes := []models.DnsProbe{}
+	pageQuery := &models.DaoDBReq{
+		PageReq:     models.PageReq{Page: req.Page, PageSize: req.PageSize},
+		PageRsp:     models.PageRsp{},
+		Dst:         &probes,
+		ModelFilter: filter,
+		OrderBy:     "id desc",
+	}
+	err := models.TemPlatePageQuery(pageQuery)
+	if err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	ctx.SucceedRsp(c, probes, &pageQuery.PageRsp)
+}
+
+// @Summary  del dns probe
+// @Tags     dns
+// @Produce  json
+// @Param    token  header  string           false  "jwt token"
+// @Param    id     path    int              true   "probe id"
+// @Success  200    object  ctx.StdResponse  "probe id"
+// @Router   /api/v1/dns/probes/{id} [DELETE]
+func delProbe(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	opt := models.DaoDBReq{
+		Dst: &models.DnsProbe{
+			BaseModel: models.BaseModel{Id: uint(id)},
+		},
+	}
+
+	if err := models.TemplateSoftDelete(opt); err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	ctx.SucceedRsp(c, id, nil)
+}
+
+type updateProbeReq struct {
+	Id           uint
+	ExpectAnswer models.MySlice[string] `binding:"gt=0" json:"expect_answer,omitempty"`
+}
+
+// @Summary  update dns probe
+// @Tags     dns
+// @Produce  json
+// @Param    token    header  string           false  "jwt token"
+// @Param    request  body    updateProbeReq   true   "req"
+// @Success  200      object  ctx.StdResponse  "ok"
+// @Router   /api/v1/dns/probes [PUT]
+func updateProbe(c *gin.Context) {
+	req := &updateProbeReq{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	probe := &models.DnsProbe{
+		BaseModel:    models.BaseModel{Id: req.Id},
+		ExpectAnswer: req.ExpectAnswer,
+	}
+	probe.SetFqdn()
+	fields := []string{"expect_answer"}
+	if err := models.TemplateUpdate(probe, fields); err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	ctx.SucceedRsp(c, req.Id, nil)
+}
+
+type newProbe struct {
+	RecordName   string                 `binding:"gt=0" json:"record_name,omitempty"`
+	Zone         string                 `json:"zone,omitempty"`
+	ExpectAnswer models.MySlice[string] `binding:"gt=0" json:"expect_answer,omitempty"`
+	Intranet     bool                   `json:"intranet"`
+}
+
+// @Summary  add dns probe
+// @Tags     dns
+// @Produce  json
+// @Param    token    header  string           false  "jwt token"
+// @Param    request  body    newProbe         true   "req"
+// @Success  200      object  ctx.StdResponse  "probe id"
+// @Router   /api/v1/dns/probes [POST]
+func addProbe(c *gin.Context) {
+	req := &newProbe{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	existProbe := &models.DnsProbe{
+		RecordName: dns.Fqdn(req.RecordName),
+	}
+	err := models.TemplateQuery(&models.DaoDBReq{
+		Dst:         existProbe,
+		ModelFilter: existProbe,
+	})
+	if err == nil {
+		ctx.FailedRsp(c, fmt.Errorf("%s probe already exist", req.RecordName))
+		return
+	}
+
+	username := ctx.GetLoginUsername(c)
+	newDnsProbe := &models.DnsProbe{
+		RecordName:   req.RecordName,
+		Zone:         req.Zone,
+		ExpectAnswer: req.ExpectAnswer,
+		Creator:      username,
+		Intranet:     req.Intranet,
+	}
+	newDnsProbe.SetFqdn()
+	if err := models.TemplateCreate(newDnsProbe); err != nil {
+		ctx.FailedRsp(c, err)
+		return
+	}
+	ctx.SucceedRsp(c, newDnsProbe.Id, nil)
 }
 
 func LoadDnsApis(r *gin.Engine) {
@@ -399,7 +550,10 @@ func LoadDnsApis(r *gin.Engine) {
 		{Path: "/dns/edns", Method: http.MethodGet, Description: "公网edns查询", Handler: ednsQuery},
 		{Path: "/dns/isps", Method: http.MethodGet, Description: "各省份运营商dns地址", Handler: getIsps},
 
-		{Path: "/dns/probe/:id", Method: http.MethodDelete, Description: "dns探测删除", Handler: delUser},
+		{Path: "/dns/probes", Method: http.MethodGet, Description: "探测记录枚举", Handler: listDnsProbes},
+		{Path: "/dns/probes/:id", Method: http.MethodDelete, Description: "探测删除", Handler: delProbe},
+		{Path: "/dns/probes", Method: http.MethodPut, Description: "dns探测更新", Handler: updateProbe},
+		{Path: "/dns/probes", Method: http.MethodPost, Description: "dns探测新增", Handler: addProbe},
 	}
 	loadApi(r, ginGroupApiV1, apis)
 }

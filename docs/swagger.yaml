@@ -33,6 +33,17 @@ definitions:
       zone:
         type: string
     type: object
+  apis.newProbe:
+    properties:
+      expect_answer:
+        type: object
+      intranet:
+        type: boolean
+      record_name:
+        type: string
+      zone:
+        type: string
+    type: object
   apis.newUser:
     properties:
       email:
@@ -108,6 +119,13 @@ definitions:
         description: task args
     required:
     - id
+    type: object
+  apis.updateProbeReq:
+    properties:
+      expect_answer:
+        type: object
+      id:
+        type: integer
     type: object
   apis.updateRoleReq:
     properties:
@@ -285,9 +303,8 @@ info:
 paths:
   /api/v1/apis:
     get:
-      description: page query apis by params
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -322,14 +339,12 @@ paths:
       tags:
       - system
     put:
-      description: api's active and audit attributes
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
-      - description: 'id: api db id; audit: true 1, request logged; active: true 1,
-          in use'
+      - description: req
         in: body
         name: request
         schema:
@@ -347,7 +362,7 @@ paths:
   /api/v1/audit_logs:
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -383,7 +398,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: role id
+          description: audit logs
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: list system audit logs
@@ -392,7 +407,7 @@ paths:
   /api/v1/cronjobs:
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -416,7 +431,7 @@ paths:
         in: query
         name: task_type
         type: string
-      - description: cronjob started
+      - description: cronjob running status
         in: query
         name: started
         type: boolean
@@ -428,7 +443,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: users
+          description: cronjobs
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: list cronjob
@@ -436,11 +451,11 @@ paths:
       - cronjob
     post:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
-      - description: cronjob request
+      - description: new cronjob request
         in: body
         name: request
         required: true
@@ -450,7 +465,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: cronjob id
+          description: new cronjob id
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: add cronjob
@@ -458,7 +473,7 @@ paths:
       - cronjob
     put:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -481,7 +496,7 @@ paths:
   /api/v1/cronjobs/{id}:
     delete:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -500,10 +515,27 @@ paths:
       summary: del cronjob
       tags:
       - cronjob
+  /api/v1/cronjobs/functions:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cronjob functions
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list cronjob functions
+      tags:
+      - cronjob
   /api/v1/dns/edns:
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -516,7 +548,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: roles
+          description: rrs
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: edns query
@@ -525,7 +557,7 @@ paths:
   /api/v1/dns/isps:
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -539,10 +571,109 @@ paths:
       summary: province isp ns ip
       tags:
       - dns
+  /api/v1/dns/probes:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: record name
+        in: query
+        name: record_name
+        type: string
+      - description: record zone
+        in: query
+        name: zone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: probes
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list dns probe
+      tags:
+      - dns
+    post:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: req
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newProbe'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: probe id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add dns probe
+      tags:
+      - dns
+    put:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: req
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateProbeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update dns probe
+      tags:
+      - dns
+  /api/v1/dns/probes/{id}:
+    delete:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: probe id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: probe id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del dns probe
+      tags:
+      - dns
   /api/v1/dns/records:
     delete:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -559,7 +690,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: user id
+          description: record id
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: del intranet dns record
@@ -567,7 +698,7 @@ paths:
       - dns
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -595,7 +726,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: roles
+          description: dns records
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: list intranet dns
@@ -603,7 +734,7 @@ paths:
       - dns
     post:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -617,7 +748,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: user id
+          description: ok
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: add intranet dns
@@ -625,7 +756,7 @@ paths:
       - dns
     put:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -639,7 +770,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: user id
+          description: record id
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: update intranet dns
@@ -648,7 +779,7 @@ paths:
   /api/v1/dns/rrs:
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -661,7 +792,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: roles
+          description: rrs
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: intranet dns query
@@ -670,7 +801,7 @@ paths:
   /api/v1/dns/zones:
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -686,7 +817,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: roles
+          description: zone
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: list intranet dns zone
@@ -694,7 +825,7 @@ paths:
       - dns
     post:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -708,7 +839,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: user id
+          description: zone id
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: add intranet dns zone
@@ -716,7 +847,7 @@ paths:
       - dns
     put:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -730,7 +861,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: user id
+          description: zone id
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: update intranet dns zone
@@ -739,11 +870,11 @@ paths:
   /api/v1/dns/zones/{id}:
     delete:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
-      - description: user id
+      - description: zone id
         in: path
         name: id
         required: true
@@ -752,7 +883,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: user id
+          description: zone id
           schema:
             $ref: '#/definitions/ctx.StdResponse'
       summary: del intranet dns zone
@@ -770,14 +901,13 @@ paths:
           description: pong
           schema:
             $ref: '#/definitions/ctx.StdResponse'
-      summary: service ping api
+      summary: ping
       tags:
       - health
   /api/v1/roles:
     get:
-      description: get all system roles in pages
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -805,7 +935,7 @@ paths:
       - system
     post:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -827,7 +957,7 @@ paths:
       - system
     put:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -850,7 +980,7 @@ paths:
   /api/v1/roles/{id}:
     delete:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -872,7 +1002,7 @@ paths:
   /api/v1/roles/{id}/apis:
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -894,7 +1024,7 @@ paths:
   /api/v1/users:
     get:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -930,7 +1060,7 @@ paths:
       - system
     post:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -952,7 +1082,7 @@ paths:
       - system
     put:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string
@@ -975,7 +1105,7 @@ paths:
   /api/v1/users/{id}:
     delete:
       parameters:
-      - description: min=1
+      - description: jwt token
         in: header
         name: token
         type: string

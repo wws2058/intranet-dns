@@ -24,9 +24,9 @@ type newCronjob struct {
 // @Summary  add cronjob
 // @Tags     cronjob
 // @Produce  json
-// @Param    token    header  string            false  "min=1"
-// @Param    request  body    newCronjob       true   "cronjob request"
-// @Success  200      object  ctx.StdResponse   "cronjob id"
+// @Param    token    header  string            false  "jwt token"
+// @Param    request  body    newCronjob       true   "new cronjob request"
+// @Success  200      object  ctx.StdResponse  "new cronjob id"
 // @Router   /api/v1/cronjobs [POST]
 func addCronjob(c *gin.Context) {
 	// name uniq_key
@@ -62,15 +62,15 @@ func addCronjob(c *gin.Context) {
 // @Summary  list cronjob
 // @Tags     cronjob
 // @Produce  json
-// @Param    token         header  string           false  "min=1"
+// @Param    token  header  string           false  "jwt token"
 // @Param    page          query   int              false  "page, min=1"
 // @Param    page_size     query   int              false  "page size, min=10, max=1000"
 // @Param    name          query   string           false  "cronjob name"
 // @Param    creator       query   string           false  "cronjob creator"
 // @Param    task_type     query   string           false  "cronjob type"
-// @Param    started       query   bool             false  "cronjob started"
+// @Param    started       query   bool             false  "cronjob running status"
 // @Param    last_succeed  query   bool             false  "cronjob last running status"
-// @Success  200           object  ctx.StdResponse  "users"
+// @Success  200           object  ctx.StdResponse  "cronjobs"
 // @Router   /api/v1/cronjobs [GET]
 func listCronjob(c *gin.Context) {
 	var req struct {
@@ -121,7 +121,7 @@ func listCronjob(c *gin.Context) {
 // @Summary  del cronjob
 // @Tags     cronjob
 // @Produce  json
-// @Param    token  header  string           false  "min=1"
+// @Param    token  header  string           false  "jwt token"
 // @Param    id     path    int              true   "cronjob id"
 // @Success  200    object  ctx.StdResponse  "cronjob id"
 // @Router   /api/v1/cronjobs/{id} [DELETE]
@@ -158,9 +158,9 @@ type updateCronjobReq struct {
 // @Summary  update cronjob
 // @Tags     cronjob
 // @Produce  json
-// @Param    token    header  string           false  "min=1"
+// @Param    token    header  string           false  "jwt token"
 // @Param    request  body    updateCronjobReq  true   "update cronjob request"
-// @Success  200      object  ctx.StdResponse  "cronjob id"
+// @Success  200      object  ctx.StdResponse   "cronjob id"
 // @Router   /api/v1/cronjobs [PUT]
 func updateCronjob(c *gin.Context) {
 	req := &updateCronjobReq{}
@@ -209,6 +209,16 @@ func updateCronjob(c *gin.Context) {
 	ctx.SucceedRsp(c, req.Id, nil)
 }
 
+// @Summary  list cronjob functions
+// @Tags     cronjob
+// @Produce  json
+// @Param    token         header  string           false  "jwt token"
+// @Success  200    object  ctx.StdResponse  "cronjob functions"
+// @Router   /api/v1/cronjobs/functions [GET]
+func listCronjobFunctions(c *gin.Context) {
+	ctx.SucceedRsp(c, cronjob.GetInternalFunctions(), nil)
+}
+
 func LoadCronjobApis(r *gin.Engine) {
 	apis := []models.Api{
 		// system user manage
@@ -216,6 +226,7 @@ func LoadCronjobApis(r *gin.Engine) {
 		{Path: "/cronjobs", Method: http.MethodGet, Description: "列举定时任务", Handler: listCronjob},
 		{Path: "/cronjobs", Method: http.MethodPost, Description: "新增定时任务", Handler: addCronjob},
 		{Path: "/cronjobs", Method: http.MethodPut, Description: "更新定时任务", Handler: updateCronjob},
+		{Path: "/cronjobs/functions", Method: http.MethodGet, Description: "列举内置可用定时任务函数", Handler: listCronjobFunctions},
 	}
 	loadApi(r, ginGroupApiV1, apis)
 }

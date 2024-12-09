@@ -11,18 +11,17 @@ import (
 	"github.com/tswcbyy1107/intranet-dns/service"
 )
 
-// @Summary      list api
-// @Description  page query apis by params
+// @Summary  list api
 // @Tags     system
 // @Produce  json
-// @Param        token      header  string           false  "min=1"
-// @Param        page       query   int              false  "page, min=1"
-// @Param        page_size  query   int              false  "page size, min=10, max=1000"
-// @Param        path       query   string           false  "api path"
-// @Param        method     query   string           false  "api method"
-// @Param        active     query   bool             false  "api activated"
-// @Success      200        object  ctx.StdResponse  "apis"
-// @Router       /api/v1/apis [GET]
+// @Param    token      header  string           false  "jwt token"
+// @Param    page       query   int              false  "page, min=1"
+// @Param    page_size  query   int              false  "page size, min=10, max=1000"
+// @Param    path       query   string           false  "api path"
+// @Param    method     query   string           false  "api method"
+// @Param    active     query   bool             false  "api activated"
+// @Success  200        object  ctx.StdResponse  "apis"
+// @Router   /api/v1/apis [GET]
 func listApis(c *gin.Context) {
 	var req struct {
 		Path   string `form:"path"`
@@ -67,14 +66,13 @@ type updateApiReq struct {
 	Active *bool `json:"active,omitempty"`
 }
 
-// @Summary      update api
-// @Description  api's active and audit attributes
+// @Summary  update api
 // @Tags     system
 // @Produce  json
-// @Param        token    header  string           false  "min=1"
-// @Param        request  body    updateApiReq     false  "id: api db id; audit: true 1, request logged; active: true 1, in use"
-// @Success      200      object  ctx.StdResponse  "api updated"
-// @Router       /api/v1/apis [PUT]
+// @Param    token    header  string           false  "jwt token"
+// @Param    request  body    updateApiReq     false  "req"
+// @Success  200      object  ctx.StdResponse  "api updated"
+// @Router   /api/v1/apis [PUT]
 func updateApi(c *gin.Context) {
 	req := &updateApiReq{}
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -100,16 +98,15 @@ func updateApi(c *gin.Context) {
 	ctx.SucceedRsp(c, req.Id, nil)
 }
 
-// @Summary      list system roles
-// @Description  get all system roles in pages
+// @Summary  list system roles
 // @Tags     system
 // @Produce  json
-// @Param        token      header  string           false  "min=1"
-// @Param    page        query   int              false  "min=1"
-// @Param    page_size   query   int              false  "min=10, max=1000"
-// @Param        name_cn    query   string           false  "role chinese name"
-// @Success      200        object  ctx.StdResponse  "roles"
-// @Router       /api/v1/roles [GET]
+// @Param    token      header  string           false  "jwt token"
+// @Param    page       query   int              false  "min=1"
+// @Param    page_size  query   int              false  "min=10, max=1000"
+// @Param    name_cn    query   string           false  "role chinese name"
+// @Success  200        object  ctx.StdResponse  "roles"
+// @Router   /api/v1/roles [GET]
 func listSysRoles(c *gin.Context) {
 	var req struct {
 		NameCN string `json:"name_cn,omitempty" form:"name_cn"`
@@ -144,7 +141,7 @@ func listSysRoles(c *gin.Context) {
 // @Summary  system role accessible apis
 // @Tags     system
 // @Produce  json
-// @Param    token  header  string           false  "min=1"
+// @Param    token  header  string           false  "jwt token"
 // @Param    id     path    int              true   "role id"
 // @Success  200    object  ctx.StdResponse  "role detail with accessible apis"
 // @Router   /api/v1/roles/{id}/apis [GET]
@@ -176,7 +173,7 @@ func roleDetail(c *gin.Context) {
 // @Summary  del role
 // @Tags     system
 // @Produce  json
-// @Param    token  header  string           false  "min=1"
+// @Param    token  header  string           false  "jwt token"
 // @Param    id     path    int              true   "role id"
 // @Success  200    object  ctx.StdResponse  "role id"
 // @Router   /api/v1/roles/{id} [DELETE]
@@ -197,9 +194,9 @@ func delRole(c *gin.Context) {
 // @Summary  add system role
 // @Tags     system
 // @Produce  json
-// @Param    token    header  string           false  "min=1"
+// @Param    token    header  string           false  "jwt token"
 // @Param    request  body    models.SysRole   true   "role request"
-// @Success  200         object  ctx.StdResponse  "role id"
+// @Success  200      object  ctx.StdResponse  "role id"
 // @Router   /api/v1/roles [POST]
 func addRole(c *gin.Context) {
 	// name uniq_key
@@ -225,7 +222,7 @@ type updateRoleReq struct {
 // @Summary  update system role
 // @Tags     system
 // @Produce  json
-// @Param    token    header  string           false  "min=1"
+// @Param    token    header  string           false  "jwt token"
 // @Param    request  body    updateRoleReq    true   "role request"
 // @Success  200      object  ctx.StdResponse  "role id"
 // @Router   /api/v1/roles [PUT]
@@ -261,7 +258,7 @@ func updateRole(c *gin.Context) {
 // @Summary  list system user
 // @Tags     system
 // @Produce  json
-// @Param    token      header  string           false  "min=1"
+// @Param    token      header  string           false  "jwt token"
 // @Param    page       query   int              false  "page, min=1"
 // @Param    page_size  query   int              false  "page size, min=10, max=1000"
 // @Param    role_id    query   int              false  "user role's id"
@@ -311,7 +308,7 @@ func listUser(c *gin.Context) {
 // @Summary  del system user
 // @Tags     system
 // @Produce  json
-// @Param    token  header  string           false  "min=1"
+// @Param    token  header  string           false  "jwt token"
 // @Param    id     path    int              true   "user id"
 // @Success  200    object  ctx.StdResponse  "user id"
 // @Router   /api/v1/users/{id} [DELETE]
@@ -345,7 +342,7 @@ type updateUserReq struct {
 // @Summary  update system role
 // @Tags     system
 // @Produce  json
-// @Param    token    header  string           false  "min=1"
+// @Param    token    header  string           false  "jwt token"
 // @Param    request  body    updateUserReq    true   "update user request"
 // @Success  200      object  ctx.StdResponse  "user id"
 // @Router   /api/v1/users [PUT]
@@ -387,9 +384,9 @@ type newUser struct {
 }
 
 // @Summary  add system user
-// @Tags         system
-// @Produce      json
-// @Param    token    header  string           false  "min=1"
+// @Tags     system
+// @Produce  json
+// @Param    token    header  string           false  "jwt token"
 // @Param    request  body    newUser          true   "user request"
 // @Success  200      object  ctx.StdResponse  "user id"
 // @Router   /api/v1/users [POST]
@@ -422,8 +419,8 @@ type userLoginInfo struct {
 }
 
 // @Summary  user login
-// @Tags         system
-// @Produce      json
+// @Tags     system
+// @Produce  json
 // @Param    request  body    userLoginInfo    true  "user request"
 // @Success  200      object  ctx.StdResponse  "user id"
 // @Router   /api/v1/users/login [POST]
@@ -461,17 +458,17 @@ func userLogin(c *gin.Context) {
 }
 
 // @Summary  list system audit logs
-// @Tags         system
-// @Produce      json
-// @Param    token       header  string           false  "min=1"
-// @Param        page       query   int              false  "min=1"
-// @Param        page_size  query   int              false  "min=10, max=1000"
+// @Tags     system
+// @Produce  json
+// @Param    token       header  string           false  "jwt token"
+// @Param    page        query   int              false  "min=1"
+// @Param    page_size   query   int              false  "min=10, max=1000"
 // @Param    user_name   query   string           false  "user name"
 // @Param    request_id  query   string           false  "request uid"
 // @Param    client_ip   query   string           false  "remote ip"
 // @Param    start_time  query   string           false  "2006-01-02 15:04:05"
 // @Param    end_time    query   string           false  "2006-01-02 15:04:05"
-// @Success  200      object  ctx.StdResponse  "role id"
+// @Success  200         object  ctx.StdResponse  "audit logs"
 // @Router   /api/v1/audit_logs [GET]
 func listAuditLogs(c *gin.Context) {
 	var req struct {

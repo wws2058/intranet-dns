@@ -73,7 +73,7 @@ func TemplateQuery(query *DaoDBReq) (err error) {
 	return
 }
 
-// common db page query
+// common db page query, use find
 func TemPlatePageQuery(query *DaoDBReq) (err error) {
 	var total int64
 
@@ -162,35 +162,25 @@ func AutoMigrate() {
 		&Cronjob{},
 		&DnsRecord{},
 		&DnsZone{},
+		&DnsProbe{},
 	)
 
 	// create demo role
-	// superAdminR := &SysRole{
-	// 	Name:   SuperAdmin,
-	// 	NameCn: "超级管理员",
-	// }
-	// database.DB.Create(superAdminR)
+	superAdminR := &SysRole{
+		Name:   SuperAdmin,
+		NameCn: "超级管理员",
+	}
+	database.DB.Create(superAdminR)
 	// create demo user
-	// superUsers := &SysUser{
-	// 	Name:     "somebody",
-	// 	NameCn:   "系统管理员",
-	// 	Email:    "china.qq.com",
-	// 	Password: "12345678",
-	// 	RoleIds:  MySlice[uint]{superAdminR.Id},
-	// 	Active:   true,
-	// }
-	// database.DB.Create(superUsers)
-	// create demo dns zone
-	// testZone := &DnsZone{
-	// 	Zone:        "test.com.",
-	// 	NsAddress:   "1.1.1.1:53",
-	// 	TsigName:    "key-name.",
-	// 	TsigSecret:  "secret",
-	// 	Description: "test zone",
-	// 	Creator:     "somebody",
-	// }
-	// database.DB.Create(testZone)
-
+	superUsers := &SysUser{
+		Name:     "admin",
+		NameCn:   "系统管理员",
+		Email:    "china.qq.com",
+		Password: "12345678",
+		RoleIds:  MySlice[uint]{superAdminR.Id},
+		Active:   true,
+	}
+	database.DB.Create(superUsers)
 	if err != nil {
 		logrus.WithField("mysql", "auto_migrate").Error(err)
 	} else {
