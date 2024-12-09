@@ -8,12 +8,11 @@ import (
 	"github.com/tswcbyy1107/intranet-dns/models"
 )
 
-// @Summary     service ping api
-// @Production  http service health check
-// @Tags        health
-// @Param       mock  query   string           false  "mock"
-// @Success     200   object  ctx.StdResponse  "pong"
-// @Router      /api/v1/ping [GET]
+// @Summary  ping
+// @Tags     health
+// @Param    mock  query   string           false  "mock"
+// @Success  200   object  ctx.StdResponse  "pong"
+// @Router   /api/v1/ping [GET]
 func pingHandler(c *gin.Context) {
 	ctx.SucceedRsp(c, "pong", nil)
 }
