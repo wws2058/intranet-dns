@@ -1,0 +1,1150 @@
+consumes:
+- application/json
+definitions:
+  apis.newCronjob:
+    properties:
+      description:
+        description: task desc
+        type: string
+      name:
+        description: task name
+        type: string
+      spec:
+        description: spec & s m h D M W
+        minLength: 9
+        type: string
+      taskArgs:
+        $ref: '#/definitions/models.Args'
+        description: task args
+      taskType:
+        description: task type
+        type: string
+    type: object
+  apis.newDns:
+    properties:
+      record_content:
+        type: string
+      record_name:
+        type: string
+      record_ttl:
+        type: integer
+      record_type:
+        type: string
+      zone:
+        type: string
+    type: object
+  apis.newProbe:
+    properties:
+      expect_answer:
+        type: object
+      intranet:
+        type: boolean
+      record_name:
+        type: string
+      zone:
+        type: string
+    type: object
+  apis.newUser:
+    properties:
+      email:
+        description: user email address
+        minLength: 5
+        type: string
+      name:
+        description: user name
+        maxLength: 20
+        minLength: 1
+        type: string
+      name_cn:
+        description: user cn name
+        maxLength: 20
+        type: string
+      password:
+        description: user password, sha256 encode save
+        maxLength: 20
+        minLength: 8
+        type: string
+      role_ids:
+        description: user roles
+        type: object
+    type: object
+  apis.newZone:
+    properties:
+      description:
+        description: zone description
+        type: string
+      ns_address:
+        description: ns server ip:port
+        type: string
+      tsig_name:
+        description: tsig key name
+        type: string
+      tsig_secret:
+        description: ns dynamic update key, to be encoded
+        type: string
+      zone:
+        description: ns name zone name FQDN
+        type: string
+    type: object
+  apis.updateApiReq:
+    properties:
+      active:
+        type: boolean
+      audit:
+        type: boolean
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  apis.updateCronjobReq:
+    properties:
+      description:
+        description: task desc
+        type: string
+      id:
+        description: user id
+        type: integer
+      name:
+        description: task name
+        type: string
+      spec:
+        description: spec & s m h D M W
+        type: string
+      started:
+        description: task switch
+        type: boolean
+      task_args:
+        $ref: '#/definitions/models.Args'
+        description: task args
+    required:
+    - id
+    type: object
+  apis.updateProbeReq:
+    properties:
+      expect_answer:
+        type: object
+      id:
+        type: integer
+    type: object
+  apis.updateRoleReq:
+    properties:
+      api_ids:
+        description: role accessible apis id
+        items:
+          type: integer
+        type: array
+      id:
+        description: role id
+        type: integer
+      name:
+        description: role en name
+        type: string
+      name_cn:
+        description: role cn name
+        type: string
+    required:
+    - id
+    type: object
+  apis.updateUserReq:
+    properties:
+      active:
+        description: user is active
+        type: boolean
+      email:
+        description: user email address
+        type: string
+      id:
+        description: user id
+        type: integer
+      role_ids:
+        description: user roles
+        items:
+          type: integer
+        type: array
+    required:
+    - id
+    type: object
+  apis.updateZoneReq:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      ns_address:
+        type: string
+      tsig_name:
+        type: string
+      tsig_secret:
+        type: string
+      zone:
+        type: string
+    required:
+    - id
+    type: object
+  apis.userLoginInfo:
+    properties:
+      name:
+        description: user name
+        maxLength: 20
+        minLength: 1
+        type: string
+      password:
+        description: user password, sha256 encode save
+        maxLength: 20
+        minLength: 8
+        type: string
+    type: object
+  ctx.StdResponse:
+    properties:
+      data:
+        description: data
+      error:
+        description: self err
+        type: string
+      pages:
+        $ref: '#/definitions/models.PageRsp'
+        description: pages
+      request_id:
+        description: api request uid
+        type: string
+      status:
+        description: 'true: succeed, false: failed'
+        type: boolean
+    type: object
+  dnslib.UpdateDnsReq:
+    properties:
+      id:
+        type: integer
+      record_content:
+        type: string
+      record_name:
+        type: string
+      record_ttl:
+        type: integer
+    required:
+    - id
+    type: object
+  models.Api:
+    properties:
+      active:
+        description: api is activated or not, 0 false
+        type: boolean
+      audit:
+        description: api is audited or not, 0 false
+        type: boolean
+      auth:
+        description: api requires auth
+        type: boolean
+      created_at:
+        description: create time
+        type: string
+      description:
+        description: api description
+        type: string
+      id:
+        description: primary id
+        type: integer
+      method:
+        description: api method
+        type: string
+      path:
+        description: api path
+        type: string
+      updated_at:
+        description: create time
+        type: string
+    type: object
+  models.Args:
+    properties:
+      function_name:
+        description: function name
+        type: string
+      url:
+        description: http url
+        type: string
+    type: object
+  models.PageRsp:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  models.SysRole:
+    properties:
+      accessible_apis:
+        items:
+          $ref: '#/definitions/models.Api'
+        type: array
+      api_ids:
+        type: object
+      created_at:
+        description: create time
+        type: string
+      id:
+        description: primary id
+        type: integer
+      name:
+        type: string
+      name_cn:
+        type: string
+      updated_at:
+        description: create time
+        type: string
+    type: object
+info:
+  contact: {}
+  description: simple intranet dns management system, dns crud operation with bind9
+  title: sre intranet dns backend demo
+  version: "1.0"
+paths:
+  /api/v1/apis:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: page, min=1
+        in: query
+        name: page
+        type: integer
+      - description: page size, min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: api path
+        in: query
+        name: path
+        type: string
+      - description: api method
+        in: query
+        name: method
+        type: string
+      - description: api activated
+        in: query
+        name: active
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: apis
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list api
+      tags:
+      - system
+    put:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: req
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/apis.updateApiReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: api updated
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update api
+      tags:
+      - system
+  /api/v1/audit_logs:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: user name
+        in: query
+        name: user_name
+        type: string
+      - description: request uid
+        in: query
+        name: request_id
+        type: string
+      - description: remote ip
+        in: query
+        name: client_ip
+        type: string
+      - description: "2006-01-02 15:04:05"
+        in: query
+        name: start_time
+        type: string
+      - description: "2006-01-02 15:04:05"
+        in: query
+        name: end_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: audit logs
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list system audit logs
+      tags:
+      - system
+  /api/v1/cronjobs:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: page, min=1
+        in: query
+        name: page
+        type: integer
+      - description: page size, min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: cronjob name
+        in: query
+        name: name
+        type: string
+      - description: cronjob creator
+        in: query
+        name: creator
+        type: string
+      - description: cronjob type
+        in: query
+        name: task_type
+        type: string
+      - description: cronjob running status
+        in: query
+        name: started
+        type: boolean
+      - description: cronjob last running status
+        in: query
+        name: last_succeed
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cronjobs
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list cronjob
+      tags:
+      - cronjob
+    post:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: new cronjob request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newCronjob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: new cronjob id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add cronjob
+      tags:
+      - cronjob
+    put:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: update cronjob request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateCronjobReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cronjob id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update cronjob
+      tags:
+      - cronjob
+  /api/v1/cronjobs/{id}:
+    delete:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: cronjob id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cronjob id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del cronjob
+      tags:
+      - cronjob
+  /api/v1/cronjobs/functions:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cronjob functions
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list cronjob functions
+      tags:
+      - cronjob
+  /api/v1/dns/edns:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: domain
+        in: query
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: rrs
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: edns query
+      tags:
+      - dns
+  /api/v1/dns/isps:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: isps
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: province isp ns ip
+      tags:
+      - dns
+  /api/v1/dns/probes:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: record name
+        in: query
+        name: record_name
+        type: string
+      - description: record zone
+        in: query
+        name: zone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: probes
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list dns probe
+      tags:
+      - dns
+    post:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: req
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newProbe'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: probe id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add dns probe
+      tags:
+      - dns
+    put:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: req
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateProbeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update dns probe
+      tags:
+      - dns
+  /api/v1/dns/probes/{id}:
+    delete:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: probe id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: probe id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del dns probe
+      tags:
+      - dns
+  /api/v1/dns/records:
+    delete:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: record id
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: del all of the same type rrs
+        in: query
+        name: clean
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: record id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del intranet dns record
+      tags:
+      - dns
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: domain
+        in: query
+        name: record_name
+        type: string
+      - description: type
+        in: query
+        name: record_type
+        type: string
+      - description: data
+        in: query
+        name: record_content
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: dns records
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list intranet dns
+      tags:
+      - dns
+    post:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: dns request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newDns'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add intranet dns
+      tags:
+      - dns
+    put:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: update dns request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dnslib.UpdateDnsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: record id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update intranet dns
+      tags:
+      - dns
+  /api/v1/dns/rrs:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: domain
+        in: query
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: rrs
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: intranet dns query
+      tags:
+      - dns
+  /api/v1/dns/zones:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: zone
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list intranet dns zone
+      tags:
+      - dns
+    post:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: zone request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newZone'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: zone id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add intranet dns zone
+      tags:
+      - dns
+    put:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: update zone request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateZoneReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: zone id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update intranet dns zone
+      tags:
+      - dns
+  /api/v1/dns/zones/{id}:
+    delete:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: zone id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: zone id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del intranet dns zone
+      tags:
+      - dns
+  /api/v1/ping:
+    get:
+      parameters:
+      - description: mock
+        in: query
+        name: mock
+        type: string
+      responses:
+        "200":
+          description: pong
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: ping
+      tags:
+      - health
+  /api/v1/roles:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: min=1
+        in: query
+        name: page
+        type: integer
+      - description: min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: role chinese name
+        in: query
+        name: name_cn
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: roles
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list system roles
+      tags:
+      - system
+    post:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: role request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SysRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add system role
+      tags:
+      - system
+    put:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: role request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateRoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update system role
+      tags:
+      - system
+  /api/v1/roles/{id}:
+    delete:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del role
+      tags:
+      - system
+  /api/v1/roles/{id}/apis:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role detail with accessible apis
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: system role accessible apis
+      tags:
+      - system
+  /api/v1/users:
+    get:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: page, min=1
+        in: query
+        name: page
+        type: integer
+      - description: page size, min=10, max=1000
+        in: query
+        name: page_size
+        type: integer
+      - description: user role's id
+        in: query
+        name: role_id
+        type: integer
+      - description: user chinese name
+        in: query
+        name: name_cn
+        type: string
+      - description: system role activated
+        in: query
+        name: active
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: list system user
+      tags:
+      - system
+    post:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.newUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: add system user
+      tags:
+      - system
+    put:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: update user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.updateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: update system role
+      tags:
+      - system
+  /api/v1/users/{id}:
+    delete:
+      parameters:
+      - description: jwt token
+        in: header
+        name: token
+        type: string
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: del system user
+      tags:
+      - system
+  /api/v1/users/login:
+    post:
+      parameters:
+      - description: user request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.userLoginInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            $ref: '#/definitions/ctx.StdResponse'
+      summary: user login
+      tags:
+      - system
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"
