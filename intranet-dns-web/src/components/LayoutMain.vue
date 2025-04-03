@@ -34,5 +34,7 @@ watch(() => route.path, () => {
   background-color: white;
   margin: 8px 8px;
   padding: 24px;
+  min-height: 200px;
+  min-width: 800px;
 }
 </style>

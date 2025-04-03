@@ -4,7 +4,8 @@
       <DnsLogo></DnsLogo>
       <span v-if="!store.collapsed">DNS内网管控系统</span>
     </div>
-    <a-menu v-model:selectedKeys="store.selectedKeys" mode="inline" theme="dark" :items="store.siderNavs"></a-menu>
+    <a-menu v-model:selectedKeys="store.selectedKeys" mode="inline" theme="dark" :items="store.siderNavs"
+      :openKeys="store.openkeys"></a-menu>
   </a-layout-sider>
 </template>
 

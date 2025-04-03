@@ -48,8 +48,6 @@ function logout() {
   localStorage.removeItem(localStoreUserDataKey);
   router.push({ name: "UserLogin" });
 }
-
-// console.log(logout());
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, reactive, h, computed } from "vue";
+import { ref, reactive, h, computed, toRaw } from "vue";
 import {
   SearchOutlined,
   FileSearchOutlined,
@@ -69,6 +69,14 @@ export const layoutStore = defineStore("layoutStore", () => {
     },
   ]);
 
+  const openkeys = computed(() => {
+    const sub1Keys = ["4", "5", "6"];
+    const selectedKeysArray = toRaw(selectedKeys.value);
+    const contained = sub1Keys.some((key) => selectedKeysArray.includes(key));
+    const opened = !collapsed.value && contained;
+    return opened ? ["sub1"] : [];
+  });
+
   const selecttedLabel = computed(() => {
     function findLabel(key, items) {
       for (const item of items) {
@@ -113,6 +121,7 @@ export const layoutStore = defineStore("layoutStore", () => {
     siderNavs,
     selectedKeys,
     selecttedLabel,
+    openkeys,
     collapsed,
     switchCollapsed,
     getSelectedKey,

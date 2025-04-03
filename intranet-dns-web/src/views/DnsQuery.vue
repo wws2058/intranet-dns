@@ -6,10 +6,4 @@
 
 </script>
 
-<script>
-export default {
-  name: 'DnsQuery'
-};
-</script>
-
 <style scoped></style>

@@ -18,14 +18,27 @@ export async function userLogin(userMsg) {
 
 // 校验jwt token是否有效
 export function isTokenValid(token) {
-  if (token === null || token === undefined) {
-    return false;
-  }
-  const decoded = jwtDecode(token);
-  if (!decoded.exp) {
-    return false;
-  }
+  try {
+    if (token === null || token === undefined) {
+      return false;
+    }
+    const decoded = jwtDecode(token);
+    if (!decoded.exp) {
+      return false;
+    }
 
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-  return decoded.exp > currentTimestamp;
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    return decoded.exp > currentTimestamp;
+  } catch (error) {
+    console.log("jwt token parse failed:", error);
+    return false;
+  }
+}
+
+// 获取系统角色, post body {page page_size name_cn}
+export async function getSysRoles(queryRoleObj) {
+  const response = await request.post("/api/v1/roles", queryRoleObj);
+  if (response.status === 200 && response.data.status) {
+    return response.data;
+  }
 }
