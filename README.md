@@ -1,4 +1,8 @@
-## intranet dns
+## intranet-dns-web
+基于Vue3、Vite、Vue-Router4、Pina、ant-design-vue3开发的内网dns管理系统前端界面.
+
+
+## intranet-dns-backend
 基于gin框架开发的内网dns管理系统后端demo, 支持动态dns修改(RFC 2136标准)、dns探测等功能. 提供dns解析的基础服务为bind. 支持多节点部署.
 
 启动方式: `go run cmd/main.go`, [本地swagger查看api详情](http://localhost:16789/swagger/index.html)  <br>
