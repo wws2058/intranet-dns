@@ -9,7 +9,7 @@ import (
 
 // standard response
 type StdResponse struct {
-	Status    bool            `json:"status,omitempty"`     // true: succeed, false: failed
+	Status    bool            `json:"status"`               // true: succeed, false: failed
 	Pages     *models.PageRsp `json:"pages,omitempty"`      // pages
 	Data      interface{}     `json:"data,omitempty"`       // data
 	RequestID string          `json:"request_id,omitempty"` // api request uid

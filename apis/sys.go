@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tswcbyy1107/intranet-dns/ctx"
 	"github.com/tswcbyy1107/intranet-dns/models"
-	"github.com/tswcbyy1107/intranet-dns/service"
+	"github.com/tswcbyy1107/intranet-dns/service/jwt"
 )
 
 // @Summary  list api
@@ -449,7 +449,7 @@ func userLogin(c *gin.Context) {
 		ctx.FailedRsp(c, fmt.Errorf("user is inactive"))
 		return
 	}
-	jwtToken, _ := service.GenJwtToken(user.Name)
+	jwtToken, _ := jwt.GenJwtToken(user.Name)
 	ctx.SucceedRsp(c, map[string]interface{}{
 		"name":      user.Name,
 		"jwt_token": jwtToken,

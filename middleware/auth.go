@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tswcbyy1107/intranet-dns/ctx"
 	"github.com/tswcbyy1107/intranet-dns/models"
-	"github.com/tswcbyy1107/intranet-dns/service"
+	"github.com/tswcbyy1107/intranet-dns/service/jwt"
 	"github.com/tswcbyy1107/intranet-dns/utils"
 )
 
@@ -19,16 +19,16 @@ var whiteApis = []string{
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// skip auth
-		if utils.Contains[string](whiteApis, c.FullPath()) || strings.Contains(c.FullPath(), "swagger") {
+		if utils.Contains(whiteApis, c.FullPath()) || strings.Contains(c.FullPath(), "swagger") {
 			c.Next()
 			return
 		}
 
 		// check if jwt token legal
 		jwtToken := c.Request.Header.Get("token")
-		claim, err := service.ParseToken(jwtToken)
+		claim, err := jwt.ParseToken(jwtToken)
 		if err != nil {
-			ctx.AbortRsp(c, err)
+			ctx.AbortRsp(c, fmt.Errorf("illegal token"))
 			return
 		}
 
@@ -57,8 +57,8 @@ func Auth() gin.HandlerFunc {
 		}
 		// exclude inactive apis
 		permissions, _ := user.GetAccessibleApis()
-		if !utils.Contains[string](permissions, fmt.Sprintf("%s/%s", c.FullPath(), c.Request.Method)) {
-			ctx.AbortRsp(c, fmt.Errorf("has no %s/%s permission", c.FullPath(), c.Request.Method))
+		if !utils.Contains(permissions, fmt.Sprintf("%s/%s", c.FullPath(), c.Request.Method)) {
+			ctx.AbortRsp(c, fmt.Errorf("has no %s %s permission", c.FullPath(), c.Request.Method))
 			return
 		}
 

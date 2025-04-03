@@ -45,18 +45,22 @@ func LogHandler() gin.HandlerFunc {
 		}
 
 		fields := map[string]interface{}{
-			"method":      c.Request.Method,
-			"url":         c.Request.URL.String(),
-			"time_cost":   cost.Milliseconds(),
-			"status_code": c.Writer.Status(),
-			"remote_ip":   c.ClientIP(),
-			"request_id":  uid,
-			// "request_body":  requestBodyString,
-			// "response_body": responseBody,
-			// "headers": c.Request.Header,
+			"method":        c.Request.Method,
+			"url":           c.Request.URL.String(),
+			"time_cost":     cost.Milliseconds(),
+			"status_code":   c.Writer.Status(),
+			"remote_ip":     c.ClientIP(),
+			"request_id":    uid,
+			"request_body":  requestBodyString,
+			"response_body": responseBodyString,
+			"headers":       c.Request.Header,
 		}
 		// log and save audit log in db
 		go func() {
+			if strings.Contains(c.Request.URL.String(), "swagger") {
+				return
+			}
+
 			logrus.WithFields(fields).Info("api_detail")
 			api := &models.Api{}
 			dao := &models.DaoDBReq{
