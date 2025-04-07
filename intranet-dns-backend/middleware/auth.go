@@ -52,7 +52,6 @@ func Auth() gin.HandlerFunc {
 		// super admin
 		if user.IsSuperAdmin() {
 			c.Next()
-			go models.UpdateUserLoginInfo(user.Name)
 			return
 		}
 		// exclude inactive apis
@@ -61,8 +60,6 @@ func Auth() gin.HandlerFunc {
 			ctx.AbortRsp(c, fmt.Errorf("has no %s %s permission", c.FullPath(), c.Request.Method))
 			return
 		}
-
 		c.Next()
-		go models.UpdateUserLoginInfo(user.Name)
 	}
 }

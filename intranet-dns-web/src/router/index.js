@@ -10,6 +10,7 @@ import SystemRoles from "@/views/SystemRoles.vue";
 import UserLogin from "@/views/UserLogin.vue";
 import DnsQuery from "@/views/DnsQuery.vue";
 import { localStoreUserDataKey, isTokenValid } from "@/apis";
+import SystemApis from "@/views/SystemApis.vue";
 
 // name string:path string
 const routesMap = {
@@ -20,6 +21,7 @@ const routesMap = {
   审计日志: "/system_audit",
   系统用户: "/system_users",
   系统角色: "/system_roles",
+  接口管理: "/system_apis",
 };
 
 const routes = [
@@ -86,6 +88,14 @@ const routes = [
     component: SystemRoles,
     meta: {
       title: "系统角色",
+    },
+  },
+  {
+    name: "SystemApis",
+    path: routesMap["接口管理"],
+    component: SystemApis,
+    meta: {
+      title: "接口管理",
     },
   },
 ];

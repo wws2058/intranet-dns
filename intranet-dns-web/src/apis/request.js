@@ -30,7 +30,9 @@ dnsAxios.interceptors.response.use(
   (response) => {
     if (response.status !== 200 || !response.data.status) {
       message.error(`request_id: ${response.data.request_id}`);
-      return Promise.reject(new Error(`request_id: ${response.data.request_id}`));
+      return Promise.reject(
+        new Error(`request_id: ${response.data.request_id}`)
+      );
     }
     return response;
   },
@@ -57,4 +59,5 @@ const request = {
   },
 };
 
+export { dnsAxios };
 export default request;

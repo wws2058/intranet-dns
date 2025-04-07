@@ -8,6 +8,7 @@ import {
   ClockCircleOutlined,
   TeamOutlined,
   UserSwitchOutlined,
+  ApiOutlined,
 } from "@ant-design/icons-vue";
 import { routesMap } from "@/router";
 
@@ -65,12 +66,19 @@ export const layoutStore = defineStore("layoutStore", () => {
           title: "系统角色",
           routePath: routesMap["系统角色"],
         },
+        {
+          key: "7",
+          icon: () => h(ApiOutlined),
+          label: "接口管理",
+          title: "接口管理",
+          routePath: routesMap["接口管理"],
+        },
       ],
     },
   ]);
 
   const openkeys = computed(() => {
-    const sub1Keys = ["4", "5", "6"];
+    const sub1Keys = ["4", "5", "6", "7"];
     const selectedKeysArray = toRaw(selectedKeys.value);
     const contained = sub1Keys.some((key) => selectedKeysArray.includes(key));
     const opened = !collapsed.value && contained;
