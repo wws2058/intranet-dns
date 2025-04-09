@@ -1,4 +1,4 @@
-import request, { dnsAxios } from "./request";
+import request from "./request";
 import { jwtDecode } from "jwt-decode";
 
 export const localStoreUserDataKey = "userdata";
@@ -41,19 +41,47 @@ export async function getSysRoles(queryRoleObj) {
 
 export async function deleteSysRole(roleId) {
   const url = `/api/v1/roles/${roleId}`;
-  await dnsAxios.delete(url);
+  await request.delete(url);
+}
+
+// put {name name_cn id api_ids id}
+export async function updateSysRole(params) {
+  await request.put("/api/v1/roles", params);
+}
+
+// post
+export async function newSysRoles(params) {
+  await request.post("/api/v1/roles", params);
 }
 
 export async function getRoleApis(roleId) {
   const url = `/api/v1/roles/${roleId}/apis`;
-  const response = await dnsAxios.get(url);
-  return response;
+  const response = await request.get(url);
+  return response.data;
 }
 
 // 系统api query params, page page_size, path, method, active
 export async function getSysApis(params) {
   const response = await request.get("/api/v1/apis", params);
   return response.data;
+}
+
+// 获取所有的api
+export async function getAllSysApis() {
+  let currentPage = 1;
+  let pageSize = 100;
+  let apis = [];
+  let totalPages = null;
+  while (true) {
+    const result = await getSysApis({ page: currentPage, page_size: pageSize });
+    totalPages = Math.ceil(result.pages.total / pageSize);
+    apis = apis.concat(result.data);
+    if (currentPage >= totalPages) {
+      break;
+    }
+    currentPage++;
+  }
+  return apis;
 }
 
 export async function updateSysApi(params) {

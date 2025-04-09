@@ -1,12 +1,12 @@
 <template>
   <!-- 搜索条件 -->
   <a-space class="search">
-    <a-input v-model:value="apiPath" placeholder="api路径"></a-input>
+    <a-input v-model:value="apiPath" placeholder="api路径" allowClear></a-input>
 
-    <a-select v-model:value="isActive" :options="boolOptions" placeholder="接口状态">
+    <a-select v-model:value="isActive" :options="boolOptions" placeholder="接口状态" allowClear>
     </a-select>
 
-    <a-select v-model:value="apiMethod" :options="apiMethodOptions" placeholder="接口方法"></a-select>
+    <a-select v-model:value="apiMethod" :options="apiMethodOptions" placeholder="接口方法" allowClear></a-select>
 
     <a-button type="primary" @click="handleSearch">搜索</a-button>
     <a-button @click="handleReset">重置</a-button>
@@ -57,6 +57,7 @@
 
 <script setup>
 import { getSysApis, updateSysApi } from '@/apis';
+import { message } from 'ant-design-vue';
 import { reactive, ref } from 'vue';
 
 // 搜索栏
@@ -79,15 +80,17 @@ const apiMethodOptions = reactive([
 
 function handleSearch() {
   const params = { page: pagination.current, page_size: pagination.pageSize };
-  if (apiMethod.value !== null) {
+  if (apiMethod.value !== null && apiMethod.value !== undefined) {
     params["method"] = apiMethod.value;
   }
-  if (isActive.value !== null) {
+  if (isActive.value !== null && isActive.value !== undefined) {
+    console.log("重置后:", isActive.value);
     params["active"] = isActive.value === "true" ? true : false;
   }
-  if (apiPath.value !== null) {
+  if (apiPath.value !== null && apiPath.value !== '') {
     params["path"] = apiPath.value;
   }
+  console.log(params);
   getApis(params);
 }
 
@@ -189,7 +192,6 @@ function handlePageChange(pages) {
   handleSearch();
 };
 
-
 // 更新判断渲染
 const buttonLoading = ref(false);
 const bindSelectObj = reactive({
@@ -223,6 +225,7 @@ const handleConfirm = async (record) => {
   await updateSysApi(params);
   handleCancel(record);
   await getApis({ page: pagination.current, page_size: pagination.pageSize });
+  message.success("更新成功");
   buttonLoading.value = false;
 };
 
