@@ -1,6 +1,9 @@
 <template>
-  <!-- 新增角色api -->
-  <a-button type="primary" class="add-button" @click="showAddSysRoleFormModal">新增角色</a-button>
+  <!-- 操作栏 -->
+  <a-space class="user-input">
+    <a-input-search v-model:value.trim="sysRoleNameCN" placeholder="角色中文名" allowClear @search="getRoles" />
+    <a-button type="primary" @click="showAddSysRoleFormModal">新增角色</a-button>
+  </a-space>
 
   <a-modal v-model:open="openAddRoleModal" title="新增系统角色" :footer="null">
     <a-form ref="addSysRoleForm" name="add-role-form" :rules="addSysRoleFormRules" labelAlign="left"
@@ -55,8 +58,8 @@
     <a-input v-model:value.lazy="searchPath" placeholder="搜索api path" allowClear class="detail-search" />
     <div class="api-details">
       <ul class="api-details-list">
-        <li v-for="api in filterSysRoleApiDetails" :key="api.id">{{ api.method }} - {{ api.path }} - {{ api.description
-        }}
+        <li v-for="api in filterSysRoleApiDetails" :key="api.id">{{ api.method }} - {{ api.path }} - {{
+          api.description }}
         </li>
       </ul>
     </div>
@@ -93,9 +96,10 @@
 
 </template>
 <script setup>
-import { deleteSysRole, getRoleApis, getSysRoles, getAllSysApis, newSysRoles, updateSysRole } from '@/apis';
+import { getAllSysApis } from '@/apis';
+import request from '@/apis/request';
 import { message } from 'ant-design-vue';
-import { reactive, ref, computed, toRaw } from 'vue';
+import { reactive, ref, computed } from 'vue';
 
 // 定义列名
 const columns = [
@@ -150,12 +154,20 @@ const dataSource = ref([]);
 const loading = ref(false);
 
 // 调用接口
+const sysRoleNameCN = ref('');
 const getRoles = async () => {
   loading.value = true;
+  const requestObj = {
+    page: pagination.current,
+    page_size: pagination.pageSize
+  };
+  if (sysRoleNameCN.value.length > 0) {
+    requestObj.name_cn = sysRoleNameCN.value;
+  }
   try {
-    const response = await getSysRoles({ page: pagination.current, page_size: pagination.pageSize });
-    const data = response?.data;
-    const pages = response?.pages;
+    const response = await request.get("/api/v1/roles", requestObj);
+    const data = response.data.data;
+    const pages = response.data.pages;
     if (data !== undefined) {
       dataSource.value = data;
     }
@@ -181,7 +193,8 @@ getRoles();
 
 // 删除角色
 const deleteOneRole = async (record) => {
-  await deleteSysRole(record.id);
+  const url = `/api/v1/roles/${record.id}`;
+  await request.delete(url);
   message.success(`${record.name_cn} 已删除`);
   getRoles();
 };
@@ -218,7 +231,7 @@ const addSysRoleButtonDisable = computed(() => {
 const addSysButtonRoleLoading = ref(false);
 const addSysRoleRequest = async () => {
   try {
-    const request = {
+    const requestObj = {
       name: addSysRoleFormObj.name,
       name_cn: addSysRoleFormObj.name_cn,
       api_ids: addSysRoleFormObj.apis.map(api => {
@@ -226,11 +239,11 @@ const addSysRoleRequest = async () => {
       })
     };
     addSysButtonRoleLoading.value = true;
-    await newSysRoles(request);
+    await request.post("/api/v1/roles", requestObj);
     addSysButtonRoleLoading.value = false;
     openAddRoleModal.value = false;
     getRoles();
-    message.success(`${request.name_cn} 添加成功`);
+    message.success(`${requestObj.name_cn} 添加成功`);
     resetAddSysRoleForm();
   } catch (error) {
     console.log(error);
@@ -279,8 +292,12 @@ const filterSysRoleApiDetails = computed(() => {
 // 查看角色详情
 async function showRoleApis(record) {
   openSysRoleDetailModal.value = true;
-  const response = await getRoleApis(record.id);
-  const accessibleApis = response.data.accessible_apis;
+  const url = `/api/v1/roles/${record.id}/apis`;
+  const response = await request.get(url);
+  const accessibleApis = response.data.data.accessible_apis;
+  if (!accessibleApis) {
+    return;
+  }
   accessibleApis.sort((a, b) => {
     if (a.method < b.method) {
       return -1;
@@ -332,7 +349,6 @@ const showUpdateSysRoleFormModal = async (record) => {
   });
   openUpdateRoleModal.value = true;
   originStoreApis = updateSysRoleObj.apis;
-  console.log("showUpdateSysRoleFormModal", toRaw(updateSysRoleObj.apis));
 };
 function resetUpdateSysRoleForm() {
   updateSysRoleForm.value.resetFields();
@@ -343,7 +359,7 @@ const updateSysRoleButtonDisable = computed(() => {
 });
 const updateSysRoleRequest = async () => {
   try {
-    const request = {
+    const requestObj = {
       id: updateSysRoleObj.id,
       name: updateSysRoleObj.name,
       name_cn: updateSysRoleObj.name_cn,
@@ -352,11 +368,11 @@ const updateSysRoleRequest = async () => {
       })
     };
     addSysButtonRoleLoading.value = true;
-    await updateSysRole(request);
+    await request.put("/api/v1/roles", requestObj);
     addSysButtonRoleLoading.value = false;
     openUpdateRoleModal.value = false;
     getRoles();
-    message.success(`${request.name_cn} 更新成功`);
+    message.success(`${requestObj.name_cn} 更新成功`);
   } catch (error) {
     console.log(error);
     addSysButtonRoleLoading.value = false;
@@ -393,5 +409,9 @@ const updateSysRoleRequest = async () => {
   list-style-type: none;
   padding: 0;
   margin: 0;
+}
+
+.user-input {
+  margin-bottom: 10px;
 }
 </style>

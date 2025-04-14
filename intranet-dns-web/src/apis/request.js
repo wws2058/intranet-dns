@@ -10,7 +10,7 @@ const dnsAxios = axios.create({
   responseEncoding: "utf8",
 });
 
-// 添加请求拦截器: 请求前获取token, token获取失败则跳转到登录界面
+// 添加请求拦截器: 请求前获取token
 dnsAxios.interceptors.request.use(
   (config) => {
     const userdata = localStorage.getItem(localStoreUserDataKey);

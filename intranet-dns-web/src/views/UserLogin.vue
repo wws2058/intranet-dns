@@ -42,9 +42,9 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons-vue';
 import { reactive, computed } from 'vue';
 import LayoutFooter from '@/components/LayoutFooter.vue';
 import { message } from 'ant-design-vue';
-import { userLogin } from '@/apis';
 import { useRouter } from 'vue-router';
 import { localStoreUserDataKey } from '@/apis';
+import request from '@/apis/request';
 
 const userLoginData = reactive({
   name: '',
@@ -67,8 +67,11 @@ const router = useRouter();
 
 const handleUserLogin = async () => {
   try {
-    const userdata = await userLogin(userLoginData);
-    localStorage.setItem(localStoreUserDataKey, JSON.stringify(userdata));
+    const rsp = await request.post("/api/v1/users/login", userLoginData);
+    localStorage.setItem(localStoreUserDataKey, JSON.stringify({
+      name: userLoginData.name,
+      jwt_token: rsp.data.data.jwt_token,
+    }));
     message.success('登录成功');
     router.push({ name: "DnsQuery" });
   } catch (error) {

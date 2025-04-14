@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import { message } from "ant-design-vue";
 import { layoutStore } from "@/store/layout";
-
+import { jwtDecode } from "jwt-decode";
 import DnsRecords from "@/views/DnsRecords.vue";
 import DnsProbes from "@/views/DnsProbes.vue";
 import SystemAudit from "@/views/SystemAudit.vue";
@@ -9,7 +9,7 @@ import SystemUsers from "@/views/SystemUsers.vue";
 import SystemRoles from "@/views/SystemRoles.vue";
 import UserLogin from "@/views/UserLogin.vue";
 import DnsQuery from "@/views/DnsQuery.vue";
-import { localStoreUserDataKey, isTokenValid } from "@/apis";
+import { localStoreUserDataKey } from "@/apis";
 import SystemApis from "@/views/SystemApis.vue";
 
 // name string:path string
@@ -104,6 +104,24 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes,
 });
+
+function isTokenValid(token) {
+  try {
+    if (token === null || token === undefined) {
+      return false;
+    }
+    const decoded = jwtDecode(token);
+    if (!decoded.exp) {
+      return false;
+    }
+
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    return decoded.exp > currentTimestamp;
+  } catch (error) {
+    console.log("jwt token parse failed:", error);
+    return false;
+  }
+}
 
 // 前置路由守卫, 使用Vue4-router写法
 router.beforeEach((to) => {

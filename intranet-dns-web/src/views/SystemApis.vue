@@ -32,11 +32,11 @@
       <template v-if="['audit', 'active'].includes(column.key)">
         <template v-if="record.isEditing && record.id === bindSelectObj.id">
           <template v-if="column.key === 'active'">
-            <a-select :options="boolOptions" size="small" placeholder="接口状态" v-model:value="bindSelectObj.active">
+            <a-select :options="boolOptions" size="small" v-model:value="bindSelectObj.active">
             </a-select>
           </template>
           <template v-if="column.key === 'audit'">
-            <a-select :options="boolOptions" size="small" placeholder="日志审计" v-model:value="bindSelectObj.audit">
+            <a-select :options="boolOptions" size="small" v-model:value="bindSelectObj.audit">
             </a-select>
           </template>
         </template>
@@ -56,9 +56,9 @@
 
 
 <script setup>
-import { getSysApis, updateSysApi } from '@/apis';
 import { message } from 'ant-design-vue';
 import { reactive, ref } from 'vue';
+import request from '@/apis/request';
 
 // 搜索栏
 const apiMethod = ref(null);
@@ -84,13 +84,11 @@ function handleSearch() {
     params["method"] = apiMethod.value;
   }
   if (isActive.value !== null && isActive.value !== undefined) {
-    console.log("重置后:", isActive.value);
     params["active"] = isActive.value === "true" ? true : false;
   }
   if (apiPath.value !== null && apiPath.value !== '') {
     params["path"] = apiPath.value;
   }
-  console.log(params);
   getApis(params);
 }
 
@@ -169,9 +167,9 @@ const pagination = reactive({
 const getApis = async (params) => {
   pageloading.value = true;
   try {
-    const response = await getSysApis(params);
-    const data = response?.data;
-    const pages = response?.pages;
+    const response = await request.get("/api/v1/apis", params);
+    const data = response?.data?.data;
+    const pages = response?.data?.pages;
     if (data !== undefined) {
       dataSource.value = data;
     }
@@ -222,7 +220,7 @@ const handleConfirm = async (record) => {
     active: bindSelectObj.active === "true" ? true : false,
     audit: bindSelectObj.audit === "true" ? true : false,
   };
-  await updateSysApi(params);
+  await request.put("/api/v1/apis", params);
   handleCancel(record);
   await getApis({ page: pagination.current, page_size: pagination.pageSize });
   message.success("更新成功");
