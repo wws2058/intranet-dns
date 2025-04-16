@@ -454,7 +454,10 @@ func userLogin(c *gin.Context) {
 		"name":      user.Name,
 		"jwt_token": jwtToken,
 	}, nil)
-	go models.UpdateUserLoginInfo(user.Name)
+	ctx.SetLoginUsername(c, user.Name)
+	go func() {
+		models.UpdateUserLoginInfo(user.Name)
+	}()
 }
 
 // @Summary  list system audit logs

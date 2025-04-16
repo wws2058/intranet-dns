@@ -12,7 +12,7 @@
         <a-input v-model:value="addSysRoleFormObj.name_cn" placeholder="请输入角色中文名" allowClear>角色中文名</a-input>
       </a-form-item>
 
-      <a-form-item label=" 角色英文名" name="name">
+      <a-form-item label="角色英文名" name="name">
         <a-input v-model:value="addSysRoleFormObj.name" placeholder="请输入角色英文名" allowClear>角色英文名</a-input>
       </a-form-item>
 
@@ -413,5 +413,7 @@ const updateSysRoleRequest = async () => {
 
 .user-input {
   margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
 }
 </style>

@@ -13,7 +13,8 @@
 
   <!-- 展示数据 -->
   <a-table :loading="searchLoading" :columns="columns" :dataSource="dataSource" :pagination="pagination"
-    @change="handlePageChange" :rowKey="dataSourceKey" @expand="handleExpand" :expandedRowKeys="expandedRowKeys">
+    @change="handlePageChange" :rowKey="dataSourceKey" @expand="handleExpand" :expandedRowKeys="expandedRowKeys"
+    tableLayout="fixed">
 
     <template #bodyCell="{ column, record }">
       <template v-if="column.key === 'user_name'">

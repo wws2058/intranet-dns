@@ -13,6 +13,9 @@ type JsonTime time.Time
 
 // MarshalJSON() ([]byte, error)
 func (j JsonTime) MarshalJSON() ([]byte, error) {
+	if j.IsZero() {
+		return []byte(`""`), nil
+	}
 	formatStr := fmt.Sprintf("\"%s\"", j.ToTime().Format(utils.DefaultTimeFormat))
 	return []byte(formatStr), nil
 }
