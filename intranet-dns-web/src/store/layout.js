@@ -9,6 +9,7 @@ import {
   TeamOutlined,
   UserSwitchOutlined,
   ApiOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons-vue";
 import { routesMap } from "@/router";
 
@@ -19,55 +20,62 @@ export const layoutStore = defineStore("layoutStore", () => {
 
   const siderNavs = reactive([
     {
-      key: "1",
+      key: "域名查询",
       icon: () => h(SearchOutlined),
       label: "域名查询",
       title: "域名查询",
       routePath: routesMap["域名查询"],
     },
     {
-      key: "2",
+      key: "解析记录",
       icon: () => h(FileSearchOutlined),
-      label: "解析管理",
-      title: "解析管理",
-      routePath: routesMap["解析管理"],
+      label: "解析记录",
+      title: "解析记录",
+      routePath: routesMap["解析记录"],
     },
     {
-      key: "3",
+      key: "域名拨测",
       icon: () => h(ClockCircleOutlined),
       label: "域名拨测",
       title: "域名拨测",
       routePath: routesMap["域名拨测"],
     },
     {
-      key: "sub1",
+      key: "区域管理",
+      icon: () => h(GlobalOutlined),
+      label: "区域管理",
+      title: "区域管理",
+      routePath: routesMap["区域管理"],
+    },
+    {
+      key: "系统管理",
       icon: () => h(AppstoreOutlined),
       label: "系统管理",
       title: "系统管理",
       children: [
         {
-          key: "4",
+          key: "审计日志",
           icon: () => h(AuditOutlined),
           label: "审计日志",
           title: "审计日志",
           routePath: routesMap["审计日志"],
         },
         {
-          key: "5",
+          key: "系统用户",
           icon: () => h(TeamOutlined),
           label: "系统用户",
           title: "系统用户",
           routePath: routesMap["系统用户"],
         },
         {
-          key: "6",
+          key: "系统角色",
           icon: () => h(UserSwitchOutlined),
           label: "系统角色",
           title: "系统角色",
           routePath: routesMap["系统角色"],
         },
         {
-          key: "7",
+          key: "接口管理",
           icon: () => h(ApiOutlined),
           label: "接口管理",
           title: "接口管理",
@@ -78,11 +86,11 @@ export const layoutStore = defineStore("layoutStore", () => {
   ]);
 
   const openkeys = computed(() => {
-    const sub1Keys = ["4", "5", "6", "7"];
+    const sub1Keys = ["审计日志", "系统用户", "系统角色", "接口管理"];
     const selectedKeysArray = toRaw(selectedKeys.value);
     const contained = sub1Keys.some((key) => selectedKeysArray.includes(key));
     const opened = !collapsed.value && contained;
-    return opened ? ["sub1"] : [];
+    return opened ? ["系统管理"] : [];
   });
 
   const selecttedLabel = computed(() => {

@@ -33,7 +33,7 @@ watch(() => route.path, () => {
 .content {
   background-color: white;
   margin: 8px 8px;
-  padding: 24px;
+  padding: 10px;
   min-height: 400px;
   min-width: 800px;
   overflow: auto;

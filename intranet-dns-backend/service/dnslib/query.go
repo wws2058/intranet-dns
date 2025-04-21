@@ -128,8 +128,7 @@ func IntranetRRsInZone(zone string) (rrs []models.DnsRR, err error) {
 // public dns 119.29.29.29 edns ipv4 query, give the remote nameserver an idea of where the client lives.
 func PublicEDnsQueryRR(domain, clientIp string) (rrs []models.DnsRR, err error) {
 	domain = dns.Fqdn(domain)
-	// public dns query rrType does not take effect, require A return all
-	rrType := RTypeStrToUint("A")
+	rrType := RTypeStrToUint("ANY")
 
 	opt := &dns.OPT{
 		Hdr: dns.RR_Header{
@@ -182,8 +181,7 @@ func PublicEDnsQueryRR(domain, clientIp string) (rrs []models.DnsRR, err error) 
 // public dns 119.29.29.29 query
 func PublicDnsQueryRR(domain string) (rrs []models.DnsRR, err error) {
 	domain = dns.Fqdn(domain)
-	// public dns query rrType does not take effect, require A return all
-	rrType := RTypeStrToUint("A")
+	rrType := RTypeStrToUint("ANY")
 
 	msg := &dns.Msg{}
 	// public dns query rrType does not take effect

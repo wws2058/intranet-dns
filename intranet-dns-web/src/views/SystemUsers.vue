@@ -1,7 +1,7 @@
 <template>
   <!-- 搜索条件 -->
   <div class="user-operations">
-    <a-space class="search">
+    <a-space class="user-search">
       <a-input v-model:value="userNameCn" placeholder="用户中文名" allowClear></a-input>
 
       <a-select v-model:value="isActive" :options="boolOptions" placeholder="用户状态" allowClear>
@@ -378,8 +378,8 @@ listUsers();
 </script>
 
 <style scoped>
-.search {
-  margin-bottom: 20px;
+.user-search {
+  margin-bottom: 10px;
 }
 
 .user-operations {

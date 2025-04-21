@@ -79,6 +79,8 @@ func RTypeStrToUint(strType string) (rrType uint16) {
 		rrType = dns.TypeAAAA
 	case "NS":
 		rrType = dns.TypeNS
+	case "ANY":
+		rrType = dns.TypeANY
 	}
 	return rrType
 }

@@ -1,6 +1,6 @@
 <template>
   <!-- 搜索条件 -->
-  <a-space class="search">
+  <a-space class="log-search">
     <a-input placeholder="用户英文名" v-model:value.trim="searchLogOBJ.user_name"></a-input>
     <a-input placeholder="请求唯一id" v-model:value.trim="searchLogOBJ.request_id"></a-input>
     <a-input placeholder="客户端ip" v-model:value.trim="searchLogOBJ.client_ip"></a-input>
@@ -131,7 +131,8 @@ const columns = [
   {
     title: "请求接口",
     dataIndex: 'url',
-    key: "url"
+    key: "url",
+    width: 300
   },
   {
     title: "请求耗时(ms)",
@@ -251,16 +252,18 @@ queryLogs();
 </script>
 
 <style scoped>
-.search {
+.log-search {
   margin-bottom: 10px;
 }
 
 .code_expand {
   display: flex;
+  max-height: 300px;
 }
 
 .code_container {
   width: 50%;
   padding: 0 5px;
+  overflow: auto;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <!-- 搜索条件 -->
-  <a-space class="search">
+  <a-space class="api-search">
     <a-input v-model:value="apiPath" placeholder="api路径" allowClear></a-input>
 
     <a-select v-model:value="isActive" :options="boolOptions" placeholder="接口状态" allowClear>
@@ -232,12 +232,7 @@ getApis({ page: pagination.current, page_size: pagination.pageSize });
 </script>
 
 <style scope>
-.add-button {
-  float: right;
+.api-search {
   margin-bottom: 10px;
-}
-
-.search {
-  margin-bottom: 20px;
 }
 </style>

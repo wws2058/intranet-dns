@@ -316,6 +316,7 @@ func addDns(c *gin.Context) {
 // @Produce  json
 // @Param    token   header  string           false  "jwt token"
 // @Param    domain  query   string           true   "domain"
+// @Param    zone    query   string           true   "zone"
 // @Success  200     object  ctx.StdResponse  "rrs"
 // @Router   /api/v1/dns/rrs [GET]
 func dnsQuery(c *gin.Context) {
@@ -324,7 +325,12 @@ func dnsQuery(c *gin.Context) {
 		ctx.FailedRsp(c, fmt.Errorf("domain requiered"))
 		return
 	}
-	rrs, err := dnslib.IntranetRRQueryAll(domain, "test.com")
+	zone := strings.TrimSpace(c.Query("zone"))
+	if len(zone) == 0 {
+		ctx.FailedRsp(c, fmt.Errorf("zone requiered"))
+		return
+	}
+	rrs, err := dnslib.IntranetRRQueryAll(domain, zone)
 	if err != nil {
 		ctx.FailedRsp(c, err)
 		return

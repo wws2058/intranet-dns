@@ -11,13 +11,15 @@ import UserLogin from "@/views/UserLogin.vue";
 import DnsQuery from "@/views/DnsQuery.vue";
 import { localStoreUserDataKey } from "@/apis";
 import SystemApis from "@/views/SystemApis.vue";
+import DnsZones from "@/views/DnsZones.vue";
 
 // name string:path string
 const routesMap = {
   用户登录: "/login",
   域名查询: "/dns_query",
-  解析管理: "/dns_records",
+  解析记录: "/dns_records",
   域名拨测: "/dns_probes",
+  区域管理: "/dns_zones",
   审计日志: "/system_audit",
   系统用户: "/system_users",
   系统角色: "/system_roles",
@@ -52,10 +54,10 @@ const routes = [
   },
   {
     name: "DnsRecords",
-    path: routesMap["解析管理"],
+    path: routesMap["解析记录"],
     component: DnsRecords,
     meta: {
-      title: "解析管理",
+      title: "解析记录",
     },
   },
   {
@@ -64,6 +66,14 @@ const routes = [
     component: DnsProbes,
     meta: {
       title: "域名拨测",
+    },
+  },
+  {
+    name: "DnsZones",
+    path: routesMap["区域管理"],
+    component: DnsZones,
+    meta: {
+      title: "区域管理",
     },
   },
   {
