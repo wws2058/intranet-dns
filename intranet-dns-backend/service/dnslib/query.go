@@ -128,8 +128,6 @@ func IntranetRRsInZone(zone string) (rrs []models.DnsRR, err error) {
 // public dns 119.29.29.29 edns ipv4 query, give the remote nameserver an idea of where the client lives.
 func PublicEDnsQueryRR(domain, clientIp string) (rrs []models.DnsRR, err error) {
 	domain = dns.Fqdn(domain)
-	rrType := RTypeStrToUint("ANY")
-
 	opt := &dns.OPT{
 		Hdr: dns.RR_Header{
 			Name:   ".",
@@ -144,36 +142,51 @@ func PublicEDnsQueryRR(domain, clientIp string) (rrs []models.DnsRR, err error) 
 			},
 		},
 	}
-	msg := &dns.Msg{}
-	// public dns query rrType does not take effect
-	msg.SetQuestion(domain, rrType)
-	msg.Extra = append(msg.Extra, opt)
 
-	dnsClient := &dns.Client{
-		Timeout: 2 * time.Second,
+	g := new(errgroup.Group)
+	ch := make(chan []models.DnsRR, len(models.LegalDnsType))
+	for _, t := range models.LegalDnsType {
+		g.Go(func() (err error) {
+			rrType := RTypeStrToUint(t)
+			msg := &dns.Msg{}
+			msg.Extra = append(msg.Extra, opt)
+			msg.SetQuestion(domain, RTypeStrToUint(t))
+			dnsClient := &dns.Client{
+				Timeout: 2 * time.Second,
+			}
+			dnsRsp, _, err := dnsClient.Exchange(msg, "119.29.29.29:53")
+			if err != nil {
+				return
+			}
+			if dnsRsp == nil {
+				err = fmt.Errorf("no answer")
+				return
+			}
+			if dnsRsp.Rcode != dns.RcodeSuccess {
+				err = fmt.Errorf("dns failed rcode:%v", dns.RcodeToString[dnsRsp.Rcode])
+				return
+			}
+			tmpRRs := []models.DnsRR{}
+			for _, rr := range dnsRsp.Answer {
+				if rr.Header().Rrtype != rrType {
+					continue
+				}
+				dnsRR, err := RRToDnsRR(rr, ".")
+				if err != nil {
+					continue
+				}
+				tmpRRs = append(tmpRRs, dnsRR)
+			}
+			ch <- tmpRRs
+			return
+		})
 	}
-
-	dnsRsp, _, err := dnsClient.Exchange(msg, "119.29.29.29:53")
-	if err != nil {
-		return
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
-	if dnsRsp == nil {
-		err = fmt.Errorf("no answer")
-		return
-	}
-	if dnsRsp.Rcode != dns.RcodeSuccess {
-		err = fmt.Errorf("dns failed rcode:%v", dns.RcodeToString[dnsRsp.Rcode])
-		return
-	}
-	for _, rr := range dnsRsp.Answer {
-		// if rr.Header().Rrtype != rrType {
-		// 	continue
-		// }
-		dnsRR, err := RRToDnsRR(rr, ".")
-		if err != nil {
-			continue
-		}
-		rrs = append(rrs, dnsRR)
+	close(ch)
+	for data := range ch {
+		rrs = append(rrs, data...)
 	}
 	return
 }
@@ -181,34 +194,51 @@ func PublicEDnsQueryRR(domain, clientIp string) (rrs []models.DnsRR, err error) 
 // public dns 119.29.29.29 query
 func PublicDnsQueryRR(domain string) (rrs []models.DnsRR, err error) {
 	domain = dns.Fqdn(domain)
-	rrType := RTypeStrToUint("ANY")
 
-	msg := &dns.Msg{}
-	// public dns query rrType does not take effect
-	msg.SetQuestion(domain, rrType)
+	g := new(errgroup.Group)
+	ch := make(chan []models.DnsRR, len(models.LegalDnsType))
 
-	dnsClient := &dns.Client{
-		Timeout: 2 * time.Second,
+	for _, t := range models.LegalDnsType {
+		g.Go(func() (err error) {
+			rrType := RTypeStrToUint(t)
+			msg := &dns.Msg{}
+			msg.SetQuestion(domain, RTypeStrToUint(t))
+			dnsClient := &dns.Client{
+				Timeout: 2 * time.Second,
+			}
+			dnsRsp, _, err := dnsClient.Exchange(msg, "119.29.29.29:53")
+			if err != nil {
+				return
+			}
+			if dnsRsp == nil {
+				err = fmt.Errorf("no answer")
+				return
+			}
+			if dnsRsp.Rcode != dns.RcodeSuccess {
+				err = fmt.Errorf("dns failed rcode:%v", dns.RcodeToString[dnsRsp.Rcode])
+				return
+			}
+			tmpRRs := []models.DnsRR{}
+			for _, rr := range dnsRsp.Answer {
+				if rr.Header().Rrtype != rrType {
+					continue
+				}
+				dnsRR, err := RRToDnsRR(rr, ".")
+				if err != nil {
+					continue
+				}
+				tmpRRs = append(tmpRRs, dnsRR)
+			}
+			ch <- tmpRRs
+			return
+		})
 	}
-
-	dnsRsp, _, err := dnsClient.Exchange(msg, "119.29.29.29:53")
-	if err != nil {
-		return
+	if err := g.Wait(); err != nil {
+		return nil, err
 	}
-	if dnsRsp == nil {
-		err = fmt.Errorf("no answer")
-		return
-	}
-	if dnsRsp.Rcode != dns.RcodeSuccess {
-		err = fmt.Errorf("dns failed rcode:%v", dns.RcodeToString[dnsRsp.Rcode])
-		return
-	}
-	for _, rr := range dnsRsp.Answer {
-		dnsRR, err := RRToDnsRR(rr, ".")
-		if err != nil {
-			continue
-		}
-		rrs = append(rrs, dnsRR)
+	close(ch)
+	for data := range ch {
+		rrs = append(rrs, data...)
 	}
 	return
 }

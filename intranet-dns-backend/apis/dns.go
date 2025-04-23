@@ -360,7 +360,10 @@ func ednsQuery(c *gin.Context) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			rrs, _ := dnslib.PublicEDnsQueryRR(domain, isp.DnsIP)
+			rrs, err := dnslib.PublicEDnsQueryRR(domain, isp.DnsIP)
+			if err != nil {
+				return
+			}
 			edns := dnslib.EdnsRRs{
 				ISP:      isp.ISP,
 				ClientIP: isp.DnsIP,
