@@ -18,7 +18,7 @@ import (
 
 var internalFunctionMaps = map[string]func() error{
 	"test_function": testFunction,
-	"sync_rrs":      syncDBRecordWithNsRR,
+	"sync_rrs":      SyncDBRecordWithNsRR,
 	"dns_probe":     dnsProbe,
 }
 
@@ -42,7 +42,7 @@ func testFunction() error {
 }
 
 // ensure data consistency, db records with bind
-func syncDBRecordWithNsRR() (err error) {
+func SyncDBRecordWithNsRR() (err error) {
 	zones := []string{}
 	err = database.DB.Model(&models.DnsZone{}).Pluck("zone", &zones).Error
 	if err != nil {

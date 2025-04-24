@@ -73,8 +73,8 @@ func IntranetDynamicDns(record *models.DnsRR, updateRecord *models.DnsRR, action
 		if err != nil {
 			return err
 		}
-		msg.Insert(upRRs)
 		msg.Remove(rrs)
+		msg.Insert(upRRs)
 	default:
 		return fmt.Errorf("unsupported action:%s", action)
 	}

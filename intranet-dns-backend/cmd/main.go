@@ -60,4 +60,5 @@ func init() {
 	database.InitDB()
 	models.AutoMigrate()
 	cronjob.InitCronJob()
+	cronjob.SyncDBRecordWithNsRR()
 }

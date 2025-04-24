@@ -38,13 +38,11 @@
     <!-- 特殊列 -->
     <template #bodyCell="{ record, column }">
       <template v-if="column.key === 'operations'">
-        <span>
-          <a-popconfirm title="删除系统角色?" @confirm="deleteOneRole(record)" okText="确认" cancelText="取消">
-            <a href="#">删除</a>
-          </a-popconfirm>
-          <a-divider type="vertical" />
-          <a @click="showUpdateSysRoleFormModal(record)">更新</a>
-        </span>
+        <a-popconfirm title="删除系统角色?" @confirm="deleteOneRole(record)" okText="确认" cancelText="取消">
+          <a href="#">删除</a>
+        </a-popconfirm>
+        <a-divider type="vertical" />
+        <a @click="showUpdateSysRoleFormModal(record)">更新</a>
       </template>
       <template v-else-if="column.key === 'apis'">
         <a @click="showRoleApis(record)">查看详情</a>
