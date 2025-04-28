@@ -10,6 +10,7 @@ import {
   UserSwitchOutlined,
   ApiOutlined,
   GlobalOutlined,
+  AreaChartOutlined,
 } from "@ant-design/icons-vue";
 import { routesMap } from "@/router";
 
@@ -34,6 +35,13 @@ export const layoutStore = defineStore("layoutStore", () => {
       routePath: routesMap["解析记录"],
     },
     {
+      key: "区域管理",
+      icon: () => h(GlobalOutlined),
+      label: "区域管理",
+      title: "区域管理",
+      routePath: routesMap["区域管理"],
+    },
+    {
       key: "域名拨测",
       icon: () => h(ClockCircleOutlined),
       label: "域名拨测",
@@ -41,11 +49,11 @@ export const layoutStore = defineStore("layoutStore", () => {
       routePath: routesMap["域名拨测"],
     },
     {
-      key: "区域管理",
-      icon: () => h(GlobalOutlined),
-      label: "区域管理",
-      title: "区域管理",
-      routePath: routesMap["区域管理"],
+      key: "日志图表",
+      icon: () => h(AreaChartOutlined),
+      label: "日志图表",
+      title: "日志图表",
+      routePath: routesMap["日志图表"],
     },
     {
       key: "系统管理",

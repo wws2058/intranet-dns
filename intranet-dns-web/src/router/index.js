@@ -9,6 +9,7 @@ import SystemUsers from "@/views/SystemUsers.vue";
 import SystemRoles from "@/views/SystemRoles.vue";
 import UserLogin from "@/views/UserLogin.vue";
 import DnsQuery from "@/views/DnsQuery.vue";
+import LogCharts from "@/views/LogCharts.vue";
 import { localStoreUserDataKey } from "@/apis";
 import SystemApis from "@/views/SystemApis.vue";
 import DnsZones from "@/views/DnsZones.vue";
@@ -20,6 +21,7 @@ const routesMap = {
   解析记录: "/dns_records",
   域名拨测: "/dns_probes",
   区域管理: "/dns_zones",
+  日志图表: "/log_charts",
   审计日志: "/system_audit",
   系统用户: "/system_users",
   系统角色: "/system_roles",
@@ -74,6 +76,14 @@ const routes = [
     component: DnsZones,
     meta: {
       title: "区域管理",
+    },
+  },
+  {
+    name: "LogCharts",
+    path: routesMap["日志图表"],
+    component: LogCharts,
+    meta: {
+      title: "日志图表",
     },
   },
   {

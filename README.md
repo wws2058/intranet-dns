@@ -1,26 +1,18 @@
-## 使用说明
-1.准备工作: clone仓库, 安装redis和mysql, 安装named服务并配置TSIG key.
-```bash
-git clone git@github.com:tswcbyy1107/intranet-dns.git
-```
+## 架构说明
+使用nginx作为前端代理, intranet-dns-web为前端项目, intranet-dns-backend为后端项目, named为权威dns服务器. intranet-dns-backend遵循rfc2136等规范向named权威dns服务器发起动态dns请求, 二者之间定期进行dns记录的校验同步. <br>
+![服务整体架构](./introduce-assets/framework.png)
 
-2.启动后端: 修改config.ini配置, 填入自己的mysql和redis地址密码.
-```bash
-cd intranet-dns-backend
-vim config/config.ini 
-go run cmd/main.go
-```
 
-3.启动前端: 配置了多个环境变量
-```bash
-cd intranet-dns-web
-npm i
-npm run dev
-```
 
-## 服务说明
+## 服务介绍
+
 ### intranet-dns-web
 基于Vue3、Vite、Vue-Router4、Pina、ant-design-vue3开发的内网dns管理系统前端界面.
+
+
+系统管理演示: <br>
+![系统管理演示](./introduce-assets/system-manager.gif)
+
 
 <br>
 
@@ -28,7 +20,7 @@ npm run dev
 基于gin框架开发的内网dns管理系统后端demo, 支持动态dns修改(RFC 2136标准)、dns探测等功能. 提供dns解析的基础服务为bind. 支持多节点部署.
 
 后端服务启动后, [本地swagger查看api详情](http://localhost:16789/swagger/index.html)
-<br><img src="./intranet-dns-backend/docs/swagger.png" alt="swagger示例" width="60%" height="60%">
+<br><img src="./intranet-dns-backend/docs/swagger.png" alt="swagger示例">
 
 项目项目结构如下:
 ```bash
@@ -120,4 +112,24 @@ dig a.b.c.funny.com @your_dns_server +short
 # 查看named zone文件
 cat funny.com.zone|grep a.b.c
 a.b.c			A	110.110.110.110
+```
+
+## 使用说明
+1.准备工作: clone仓库, 安装redis和mysql, 安装named服务并配置TSIG key.
+```bash
+git clone git@github.com:tswcbyy1107/intranet-dns.git
+```
+
+2.启动后端: 修改config.ini配置, 填入自己的mysql和redis地址密码.
+```bash
+cd intranet-dns-backend
+vim config/config.ini 
+go run cmd/main.go
+```
+
+3.启动前端: 配置了多个环境变量
+```bash
+cd intranet-dns-web
+npm i
+npm run dev
 ```
