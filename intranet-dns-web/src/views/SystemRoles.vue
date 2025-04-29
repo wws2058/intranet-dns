@@ -378,7 +378,7 @@ const updateSysRoleRequest = async () => {
 };
 </script>
 
-<style scope>
+<style scoped>
 .add-button {
   float: right;
   margin-bottom: 10px;

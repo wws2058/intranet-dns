@@ -1,5 +1,5 @@
 <template>
-  <a-button type="primary" class="zone-add-button">新增zone</a-button>
+  <a-button type="primary" class="zone-add-button" disabled>新增zone</a-button>
   <a-table :columns="columns" :dataSource="dataSource" :pagination="pagination" :loading="tableLoading"
     @change="handlePageChange">
 

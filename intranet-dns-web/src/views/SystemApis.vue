@@ -231,7 +231,7 @@ const handleConfirm = async (record) => {
 getApis({ page: pagination.current, page_size: pagination.pageSize });
 </script>
 
-<style scope>
+<style scoped>
 .api-search {
   margin-bottom: 10px;
 }
