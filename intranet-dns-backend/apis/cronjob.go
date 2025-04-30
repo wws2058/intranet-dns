@@ -14,11 +14,11 @@ import (
 )
 
 type newCronjob struct {
-	Name        string      `binding:"gt=0"`  // task name
-	Spec        string      `binding:"gte=9"` // spec & s m h D M W
-	Description string      `binding:"gt=0"`  // task desc
-	TaskType    string      `binding:"gt=0"`  // task type
-	TaskArgs    models.Args // task args
+	Name        string      `binding:"gt=0" json:"name,omitempty"`        // task name
+	Spec        string      `binding:"gte=9" json:"spec,omitempty"`       // spec & s m h D M W
+	Description string      `binding:"gt=0" json:"description,omitempty"` // task desc
+	TaskType    string      `binding:"gt=0" json:"task_type,omitempty"`   // task type
+	TaskArgs    models.Args `json:"task_args,omitempty"`                  // task args
 }
 
 // @Summary  add cronjob

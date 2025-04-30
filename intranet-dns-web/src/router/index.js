@@ -13,6 +13,7 @@ import LogCharts from "@/views/LogCharts.vue";
 import { localStoreUserDataKey } from "@/apis";
 import SystemApis from "@/views/SystemApis.vue";
 import DnsZones from "@/views/DnsZones.vue";
+import CronJobs from "@/views/CronJobs.vue";
 
 // name string:path string
 const routesMap = {
@@ -21,6 +22,7 @@ const routesMap = {
   解析记录: "/dns_records",
   域名拨测: "/dns_probes",
   区域管理: "/dns_zones",
+  定时任务: "/cronjobs",
   日志图表: "/log_charts",
   审计日志: "/system_audit",
   系统用户: "/system_users",
@@ -68,6 +70,14 @@ const routes = [
     component: DnsProbes,
     meta: {
       title: "域名拨测",
+    },
+  },
+  {
+    name: "CronJobs",
+    path: routesMap["定时任务"],
+    component: CronJobs,
+    meta: {
+      title: "定时任务",
     },
   },
   {

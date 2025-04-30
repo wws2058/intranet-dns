@@ -134,7 +134,6 @@ const boolOptions = reactive([
 
 const deleteLoading = ref(false);
 async function deleteUser(record) {
-  console.log(record);
   deleteLoading.value = true;
   const url = `/api/v1/users/${record.id}`;
   await request.delete(url);

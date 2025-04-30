@@ -23,8 +23,7 @@ var (
 )
 
 type RunJob struct {
-	c         *models.Cronjob
-	functions map[string]func() error
+	c *models.Cronjob
 }
 
 func (r *RunJob) Run() {
@@ -67,9 +66,9 @@ func (r *RunJob) Run() {
 			record.Succeed = false
 			record.Error = outerErr.Error()
 			r.c.LastSucceed = false
-			logrus.WithField("uid", uid).Errorf("cronjob called failed: %v", err)
+			logrus.WithField("uid", uid).WithField("name", r.c.Name).Errorf("cronjob called failed: %v", err)
 		} else {
-			logrus.WithField("uid", uid).Info("cronjob called succeed")
+			logrus.WithField("uid", uid).WithField("name", r.c.Name).Info("cronjob called succeed")
 		}
 		r.c.History.Add(record)
 		models.TemplateCreate(r.c)
@@ -149,7 +148,10 @@ func registerCronJob() {
 
 	hostname, _ := os.Hostname()
 	for _, c := range cronjobs {
-		entryID, err := cronManager.AddJob(c.Spec, &RunJob{c: c, functions: internalFunctionMaps})
+		if !c.Started {
+			continue
+		}
+		entryID, err := cronManager.AddJob(c.Spec, &RunJob{c: c})
 		if err != nil {
 			os.Exit(0)
 		}

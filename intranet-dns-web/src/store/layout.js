@@ -11,6 +11,7 @@ import {
   ApiOutlined,
   GlobalOutlined,
   AreaChartOutlined,
+  SyncOutlined,
 } from "@ant-design/icons-vue";
 import { routesMap } from "@/router";
 
@@ -47,6 +48,13 @@ export const layoutStore = defineStore("layoutStore", () => {
       label: "域名拨测",
       title: "域名拨测",
       routePath: routesMap["域名拨测"],
+    },
+    {
+      key: "定时任务",
+      icon: () => h(SyncOutlined),
+      label: "定时任务",
+      title: "定时任务",
+      routePath: routesMap["定时任务"],
     },
     {
       key: "日志图表",

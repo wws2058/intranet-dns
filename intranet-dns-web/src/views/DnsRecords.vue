@@ -101,7 +101,7 @@
 import { dnsTypes, intranetZones } from '@/apis/const';
 import request from '@/apis/request';
 import { message } from 'ant-design-vue';
-import { computed, reactive, ref, toRaw } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 const searchObj = reactive({
   record_name: null,
@@ -263,7 +263,6 @@ const handleCancelEdit = () => {
   editRecordObj.record_ttl = null;
 };
 const handleUpdateRecord = async () => {
-  console.log(toRaw(editRecordObj));
   await request.put("/api/v1/dns/records", editRecordObj);
   message.success("更新成功");
   await queryRecords(searchObj);
@@ -305,7 +304,6 @@ const addDnsRules = {
   }]
 };
 const handletAddDns = async () => {
-  console.log(toRaw(addDnsObj));
   await request.post('/api/v1/dns/records', addDnsObj);
   message.success("添加成功");
   changeOpenAddModal();
