@@ -137,10 +137,15 @@ func registerCronJob() {
 	if cronManager != nil {
 		cronManager.Stop()
 	}
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		os.Exit(0)
+	}
 
-	cronManager = cron.New(cron.WithChain(cron.Recover(cron.DefaultLogger), cron.DelayIfStillRunning(cron.DefaultLogger)))
+	cronManager = cron.New(cron.WithLocation(loc),
+		cron.WithChain(cron.Recover(cron.DefaultLogger), cron.DelayIfStillRunning(cron.DefaultLogger)))
 	cronjobs := []*models.Cronjob{}
-	err := database.DB.Find(&cronjobs).Error
+	err = database.DB.Find(&cronjobs).Error
 	if err != nil {
 		os.Exit(0)
 		return
@@ -151,6 +156,7 @@ func registerCronJob() {
 		if !c.Started {
 			continue
 		}
+		fmt.Println("debug++++add cronjob:", c.Name, c.Spec)
 		entryID, err := cronManager.AddJob(c.Spec, &RunJob{c: c})
 		if err != nil {
 			os.Exit(0)

@@ -150,8 +150,10 @@ func dnsProbe() (err error) {
 			expectStr := strings.Join(probe.ExpectAnswer, ",")
 			if str != expectStr {
 				probe.Result = models.ProbeMisMatch
-				database.DB.Save(&probe)
+			} else {
+				probe.Result = models.ProbeSucceed
 			}
+			database.DB.Save(&probe)
 		}(probe)
 	}
 	wg.Wait()
