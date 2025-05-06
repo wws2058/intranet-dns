@@ -179,6 +179,7 @@ const columns = ref([
     title: '解析记录',
     dataIndex: 'record_content',
     key: 'record_content',
+    width: 100
   },
   {
     title: '创建者',
