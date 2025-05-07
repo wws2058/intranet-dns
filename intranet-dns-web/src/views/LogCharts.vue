@@ -25,39 +25,69 @@
         <a-tab-pane key="trend" tab="趋势分析">
             <div class="sub-title">趋势</div>
             <!-- 折线图 -->
+            <v-chart class="line" :option="getLineOptions(20)"></v-chart>
 
-            <div style="height: 30px;"></div>
+            <div style="height: 10px;"></div>
 
             <div class="sub-title">实时</div>
-            <!-- 饼状图 -->
+            <v-chart class="line"></v-chart>
+
         </a-tab-pane>
     </a-tabs>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { PieChart } from "echarts/charts";
+import { PieChart, LineChart } from "echarts/charts";
 import {
     TitleComponent,
     TooltipComponent,
     LegendComponent,
+    ToolboxComponent,
+    GridComponent
 } from "echarts/components";
 import VChart from "vue-echarts";
 import { debounce } from 'lodash';
+import dayjs from 'dayjs';
+
+const activeKey = ref('trend');
 
 use([
     CanvasRenderer,
     PieChart,
+    LineChart,
     TitleComponent,
     TooltipComponent,
-    LegendComponent
+    ToolboxComponent,
+    LegendComponent,
+    GridComponent
 ]);
 
-const activeKey = ref('gather');
+function getPastNDayArray(n) {
+    const dateArray = [];
+    const currentDate = dayjs();
+    for (let i = 0; i < n; i++) {
+        const pastDate = currentDate.subtract(i, 'day');
+        const formattedDate = pastDate.format('YYYY-MM-DD');
+        dateArray.push(formattedDate);
+    }
+    dateArray.reverse();
+    return dateArray;
+}
+
+function getRandomNumArray(num) {
+    const numArray = [];
+    for (let i = 0; i < num; i++) {
+        const num = (Math.random() + 1) * (Math.random() * 1000);
+        numArray.push(parseFloat(num.toFixed(2)));
+    }
+    return numArray;
+}
+
 function getRandomNum() {
-    const num = (Math.random() + 1) * 1000;
+    const num = (Math.random() + 1) * (Math.random() * 1000);
     return parseFloat(num.toFixed(2));
 }
 
@@ -70,7 +100,23 @@ function getCharArr(num) {
     return letterArray;
 }
 
-function getCharObject(num) {
+function getLineCharObject(num) {
+    const letterArray = getCharArr(num);
+    const lineObjectArray = [];
+    letterArray.forEach((letter) => {
+        lineObjectArray.push(
+            {
+                name: letter,
+                type: 'line',
+                smooth: true,
+                data: getRandomNumArray(num)
+            }
+        );
+    });
+    return lineObjectArray;
+}
+
+function getPieCharObject(num) {
     const letterArray = getCharArr(num);
     const letterObjectArray = [];
     letterArray.forEach((letter) => {
@@ -106,12 +152,18 @@ function getPieOptions(index, num) {
             itemWidth: 10,
             itemHeight: 10,
         },
+        toolbox: {
+            show: true,
+            feature: {
+                saveAsImage: {}
+            }
+        },
         series: [
             {
                 type: "pie",
-                radius: "80%",
+                radius: "75%",
                 center: ["50%", "50%"],
-                data: getCharObject(num),
+                data: getPieCharObject(num),
                 labelLine: {
                     show: false
                 },
@@ -130,12 +182,82 @@ function getPieOptions(index, num) {
     };
 }
 
+// 折线图
+function getLineOptions(num) {
+    return {
+        title: {
+            text: '查询请求',
+            left: '1%',
+            textStyle: {
+                fontSize: 14
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+            enterable: true,
+            position: function (point) {
+                return [point[0] + 10, point[1] - 10];
+            },
+            extraCssText: 'overflow-y: auto; height: 200px;',
+            formatter: function (params) {
+                params.sort((a, b) => b.value - a.value);
+                let tooltipStr = `${params[0].axisValue}<br/>`;
+                params.forEach(item => {
+                    tooltipStr += `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:${item.color};"></span>`;
+                    tooltipStr += `${item.seriesName}: ${item.value}<br/>`;
+                });
+                return tooltipStr;
+            }
+        },
+        legend: {
+            data: getCharArr(num).map((item) => item + ".host"),
+            type: "scroll",
+            itemWidth: 10,
+            itemHeight: 10,
+            width: '30%',
+        },
+        grid: {
+            left: '1%',
+            right: '4%',
+            bottom: '10%',
+            containLabel: true
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: getPastNDayArray(num),
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: getLineCharObject(num).map((objectItem) => {
+            return {
+                ...objectItem,
+                name: objectItem.name + '.host'
+            };
+        })
+    };
+}
+
+// 防抖resize重绘
 function handleResize() {
+    sessionStorage.setItem('a-tab-pane', activeKey.value);
     location.reload();
 }
 const debouncedHandleResize = debounce(handleResize, 50);
 
 onMounted(() => {
+    nextTick(() => {
+        const savedKey = sessionStorage.getItem('a-tab-pane');
+        if (savedKey) {
+            activeKey.value = savedKey;
+        }
+    });
     window.addEventListener('resize', debouncedHandleResize);
 });
 
@@ -177,6 +299,11 @@ onUnmounted(() => {
     height: 400px;
     /* min-width: 400px; */
     background-color: rgb(248, 248, 248);
+}
+
+.line {
+    height: 280px;
+    background-color: rgba(248, 248, 248, 0.289);
 }
 
 .separator {
