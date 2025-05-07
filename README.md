@@ -9,10 +9,29 @@
 ### intranet-dns-web
 基于Vue3、Vite、Vue-Router4、Pina、ant-design-vue3开发的内网dns管理系统前端界面.
 
+内部域名管理演示: 域名的查询、域名记录的搜索、named zone管理 <br>
+<img src="./introduce-assets/common-dns.gif" width="650px" height="300px">
 
-系统管理演示: <br>
-![系统管理演示](./introduce-assets/system-manager.gif)
+附加功能演示: 域名探测、定时任务配置、日志报表等 <br>
+<img src="./introduce-assets/extra-function.gif" width="650px" height="300px">
 
+系统管理演示: 用户管理、角色管理、api管理、审计日志管理 <br>
+<img src="./introduce-assets/system-manager.gif" width="650px" height="300px">
+
+
+项目结构如下:
+```bash
+├── src
+│   ├── App.vue    # 根组件
+│   ├── apis       # axios request api
+│   ├── assets     # 静态资源
+│   ├── components # 布局组件
+│   ├── hooks      # hook js
+│   ├── main.js    # main.js
+│   ├── router     # router.js
+│   ├── store      # pina store.js
+│   └── views      # router pages
+```
 
 <br>
 
@@ -22,7 +41,7 @@
 后端服务启动后, [本地swagger查看api详情](http://localhost:16789/swagger/index.html)
 <br><img src="./intranet-dns-backend/docs/swagger.png" alt="swagger示例">
 
-项目项目结构如下:
+项目结构如下:
 ```bash
 intranet-dns-backend/
 ├── apis            # 控制器
