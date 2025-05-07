@@ -24,29 +24,25 @@
 
         <a-tab-pane key="trend" tab="趋势分析">
             <div class="sub-title">趋势</div>
-            <!-- 折线图 -->
-            <v-chart class="line" :option="getLineOptions(20)"></v-chart>
-
+            <v-chart class="line-bar" :option="getLineOptions(20)"></v-chart>
             <div style="height: 10px;"></div>
-
             <div class="sub-title">实时</div>
-            <v-chart class="line"></v-chart>
-
+            <v-chart class="line-bar" :option="getBarOptions(20)"></v-chart>
         </a-tab-pane>
     </a-tabs>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { PieChart, LineChart } from "echarts/charts";
+import { PieChart, LineChart, BarChart } from "echarts/charts";
 import {
     TitleComponent,
     TooltipComponent,
     LegendComponent,
     ToolboxComponent,
-    GridComponent
+    GridComponent,
 } from "echarts/components";
 import VChart from "vue-echarts";
 import { debounce } from 'lodash';
@@ -62,7 +58,8 @@ use([
     TooltipComponent,
     ToolboxComponent,
     LegendComponent,
-    GridComponent
+    GridComponent,
+    BarChart
 ]);
 
 function getPastNDayArray(n) {
@@ -114,6 +111,21 @@ function getLineCharObject(num) {
         );
     });
     return lineObjectArray;
+}
+
+function getBarCharObject(num) {
+    const codeArray = ['401', '403', '504'];
+    const barObjectArray = [];
+    codeArray.forEach((letter) => {
+        barObjectArray.push(
+            {
+                name: letter,
+                type: 'bar',
+                data: getRandomNumArray(num)
+            }
+        );
+    });
+    return barObjectArray;
 }
 
 function getPieCharObject(num) {
@@ -219,7 +231,7 @@ function getLineOptions(num) {
         grid: {
             left: '1%',
             right: '4%',
-            bottom: '10%',
+            bottom: '1%',
             containLabel: true
         },
         toolbox: {
@@ -244,6 +256,51 @@ function getLineOptions(num) {
     };
 }
 
+// 直方图
+function getBarOptions(num) {
+    return {
+        title: {
+            text: '错误统计',
+            left: '1%',
+            textStyle: {
+                fontSize: 14
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
+        },
+        legend: {
+            type: "scroll",
+            itemWidth: 10,
+            itemHeight: 10,
+            width: '30%',
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        grid: {
+            left: '1%',
+            right: '4%',
+            bottom: '1%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: getCharArr(num).map((item) => item + '.service')
+        },
+        yAxis: {
+            type: 'value',
+        },
+        series: getBarCharObject(num)
+    };
+}
+
 // 防抖resize重绘
 function handleResize() {
     sessionStorage.setItem('a-tab-pane', activeKey.value);
@@ -252,12 +309,10 @@ function handleResize() {
 const debouncedHandleResize = debounce(handleResize, 50);
 
 onMounted(() => {
-    nextTick(() => {
-        const savedKey = sessionStorage.getItem('a-tab-pane');
-        if (savedKey) {
-            activeKey.value = savedKey;
-        }
-    });
+    const savedKey = sessionStorage.getItem('a-tab-pane');
+    if (savedKey) {
+        activeKey.value = savedKey;
+    }
     window.addEventListener('resize', debouncedHandleResize);
 });
 
@@ -301,9 +356,10 @@ onUnmounted(() => {
     background-color: rgb(248, 248, 248);
 }
 
-.line {
-    height: 280px;
-    background-color: rgba(248, 248, 248, 0.289);
+.line-bar {
+    height: 285px;
+    /* background-color: rgba(163, 11, 11, 0.289); */
+    background-color: rgba(233, 230, 230, 0.15);
 }
 
 .separator {
