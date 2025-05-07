@@ -2,18 +2,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import { message } from "ant-design-vue";
 import { layoutStore } from "@/store/layout";
 import { jwtDecode } from "jwt-decode";
-import DnsRecords from "@/views/DnsRecords.vue";
-import DnsProbes from "@/views/DnsProbes.vue";
-import SystemAudit from "@/views/SystemAudit.vue";
-import SystemUsers from "@/views/SystemUsers.vue";
-import SystemRoles from "@/views/SystemRoles.vue";
-import UserLogin from "@/views/UserLogin.vue";
-import DnsQuery from "@/views/DnsQuery.vue";
-import LogCharts from "@/views/LogCharts.vue";
 import { localStoreUserDataKey } from "@/apis";
-import SystemApis from "@/views/SystemApis.vue";
-import DnsZones from "@/views/DnsZones.vue";
-import CronJobs from "@/views/CronJobs.vue";
 
 // name string:path string
 const routesMap = {
@@ -42,7 +31,7 @@ const routes = [
   {
     name: "UserLogin",
     path: routesMap["用户登录"],
-    component: UserLogin,
+    component: () => import("@/views/UserLogin.vue"),
     meta: {
       title: "用户登录",
       fullScreen: true, // 用户登录全屏
@@ -51,7 +40,7 @@ const routes = [
   {
     name: "DnsQuery",
     path: routesMap["域名查询"],
-    component: DnsQuery,
+    component: () => import("@/views/DnsQuery.vue"),
     meta: {
       title: "域名查询",
     },
@@ -59,7 +48,7 @@ const routes = [
   {
     name: "DnsRecords",
     path: routesMap["解析记录"],
-    component: DnsRecords,
+    component: () => import("@/views/DnsRecords.vue"),
     meta: {
       title: "解析记录",
     },
@@ -67,7 +56,7 @@ const routes = [
   {
     name: "DnsProbes",
     path: routesMap["域名拨测"],
-    component: DnsProbes,
+    component: () => import("@/views/DnsProbes.vue"),
     meta: {
       title: "域名拨测",
     },
@@ -75,7 +64,7 @@ const routes = [
   {
     name: "CronJobs",
     path: routesMap["定时任务"],
-    component: CronJobs,
+    component: () => import("@/views/CronJobs.vue"),
     meta: {
       title: "定时任务",
     },
@@ -83,7 +72,7 @@ const routes = [
   {
     name: "DnsZones",
     path: routesMap["区域管理"],
-    component: DnsZones,
+    component: () => import("@/views/DnsZones.vue"),
     meta: {
       title: "区域管理",
     },
@@ -91,7 +80,7 @@ const routes = [
   {
     name: "LogCharts",
     path: routesMap["日志图表"],
-    component: LogCharts,
+    component: () => import("@/views/LogCharts.vue"),
     meta: {
       title: "日志图表",
     },
@@ -99,7 +88,7 @@ const routes = [
   {
     name: "SystemAudit",
     path: routesMap["审计日志"],
-    component: SystemAudit,
+    component: () => import("@/views/SystemAudit.vue"),
     meta: {
       title: "审计日志",
     },
@@ -107,7 +96,7 @@ const routes = [
   {
     name: "SystemUsers",
     path: routesMap["系统用户"],
-    component: SystemUsers,
+    component: () => import("@/views/SystemUsers.vue"),
     meta: {
       title: "域名查询",
     },
@@ -115,7 +104,7 @@ const routes = [
   {
     name: "SystemRoles",
     path: routesMap["系统角色"],
-    component: SystemRoles,
+    component: () => import("@/views/SystemRoles.vue"),
     meta: {
       title: "系统角色",
     },
@@ -123,7 +112,7 @@ const routes = [
   {
     name: "SystemApis",
     path: routesMap["接口管理"],
-    component: SystemApis,
+    component: () => import("@/views/SystemApis.vue"),
     meta: {
       title: "接口管理",
     },
