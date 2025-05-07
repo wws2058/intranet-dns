@@ -1,5 +1,5 @@
 <template>
-    <a-tabs v-model:activeKey="activeKey">
+    <a-tabs v-model:activeKey="activeKey" :onChange="onchange">
         <a-tab-pane key="gather" tab="汇总分析">
             <span class="sub-title">统计</span>
             <div class="flex-container">
@@ -48,7 +48,7 @@ import VChart from "vue-echarts";
 import { debounce } from 'lodash';
 import dayjs from 'dayjs';
 
-const activeKey = ref('trend');
+const activeKey = ref('gather');
 
 use([
     CanvasRenderer,
@@ -300,6 +300,10 @@ function getBarOptions(num) {
         series: getBarCharObject(num)
     };
 }
+
+const onchange = (key) => {
+    sessionStorage.setItem('a-tab-pane', key);
+};
 
 // 防抖resize重绘
 function handleResize() {
