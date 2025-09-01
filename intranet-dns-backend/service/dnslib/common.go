@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/miekg/dns"
-	"github.com/tswcbyy1107/intranet-dns/models"
+	"github.com/wws2058/intranet-dns/models"
 )
 
 type EdnsRRs struct {

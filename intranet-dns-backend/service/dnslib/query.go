@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/tswcbyy1107/intranet-dns/models"
+	"github.com/wws2058/intranet-dns/models"
 	"golang.org/x/sync/errgroup"
 )
 

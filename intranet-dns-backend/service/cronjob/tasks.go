@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tswcbyy1107/intranet-dns/config"
-	"github.com/tswcbyy1107/intranet-dns/database"
-	"github.com/tswcbyy1107/intranet-dns/models"
-	"github.com/tswcbyy1107/intranet-dns/service/dnslib"
+	"github.com/wws2058/intranet-dns/config"
+	"github.com/wws2058/intranet-dns/database"
+	"github.com/wws2058/intranet-dns/models"
+	"github.com/wws2058/intranet-dns/service/dnslib"
 )
 
 var internalFunctionMaps = map[string]func() error{

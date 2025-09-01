@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tswcbyy1107/intranet-dns/ctx"
-	"github.com/tswcbyy1107/intranet-dns/models"
+	"github.com/wws2058/intranet-dns/ctx"
+	"github.com/wws2058/intranet-dns/models"
 )
 
 // @Summary  ping

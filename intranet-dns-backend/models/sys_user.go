@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tswcbyy1107/intranet-dns/config"
-	"github.com/tswcbyy1107/intranet-dns/database"
-	"github.com/tswcbyy1107/intranet-dns/service/redis"
-	"github.com/tswcbyy1107/intranet-dns/utils"
+	"github.com/wws2058/intranet-dns/config"
+	"github.com/wws2058/intranet-dns/database"
+	"github.com/wws2058/intranet-dns/service/redis"
+	"github.com/wws2058/intranet-dns/utils"
 	"gorm.io/gorm"
 )
 

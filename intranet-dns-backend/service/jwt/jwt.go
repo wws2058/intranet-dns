@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/tswcbyy1107/intranet-dns/config"
-	"github.com/tswcbyy1107/intranet-dns/utils"
+	"github.com/wws2058/intranet-dns/config"
+	"github.com/wws2058/intranet-dns/utils"
 )
 
 type AppJwtClaim struct {

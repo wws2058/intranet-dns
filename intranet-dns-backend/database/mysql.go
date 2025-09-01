@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tswcbyy1107/intranet-dns/config"
+	"github.com/wws2058/intranet-dns/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

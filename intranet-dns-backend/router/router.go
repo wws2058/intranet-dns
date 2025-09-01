@@ -9,12 +9,12 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"github.com/tswcbyy1107/intranet-dns/apis"
-	"github.com/tswcbyy1107/intranet-dns/config"
-	"github.com/tswcbyy1107/intranet-dns/middleware"
-	"github.com/tswcbyy1107/intranet-dns/models"
+	"github.com/wws2058/intranet-dns/apis"
+	"github.com/wws2058/intranet-dns/config"
+	"github.com/wws2058/intranet-dns/middleware"
+	"github.com/wws2058/intranet-dns/models"
 
-	_ "github.com/tswcbyy1107/intranet-dns/docs"
+	_ "github.com/wws2058/intranet-dns/docs"
 )
 
 func InitRouter() *http.Server {

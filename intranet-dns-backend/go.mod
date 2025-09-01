@@ -1,4 +1,4 @@
-module github.com/tswcbyy1107/intranet-dns
+module github.com/wws2058/intranet-dns
 
 go 1.22.0
 

@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tswcbyy1107/intranet-dns/database"
+	"github.com/wws2058/intranet-dns/database"
 	"gorm.io/plugin/soft_delete"
 )
 

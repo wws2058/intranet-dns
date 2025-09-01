@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tswcbyy1107/intranet-dns/ctx"
-	"github.com/tswcbyy1107/intranet-dns/models"
-	"github.com/tswcbyy1107/intranet-dns/service/jwt"
-	"github.com/tswcbyy1107/intranet-dns/utils"
+	"github.com/wws2058/intranet-dns/ctx"
+	"github.com/wws2058/intranet-dns/models"
+	"github.com/wws2058/intranet-dns/service/jwt"
+	"github.com/wws2058/intranet-dns/utils"
 )
 
 var whiteApis = []string{
