@@ -136,7 +136,7 @@ a.b.c			A	110.110.110.110
 ## 使用说明
 1.准备工作: clone仓库, 安装redis和mysql, 安装named服务并配置TSIG key.
 ```bash
-git clone git@github.com:tswcbyy1107/intranet-dns.git
+git clone git@github.com:wws2058/intranet-dns.git
 ```
 
 2.启动后端: 修改config.ini配置, 填入自己的mysql和redis地址密码.
